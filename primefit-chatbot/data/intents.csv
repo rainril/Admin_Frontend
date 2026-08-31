@@ -1,0 +1,316 @@
+text,intent,role
+when does my membership expire,membership_status,member
+whens my renewal date,membership_status,member
+is my membership still active,membership_status,member
+how many days left on my plan,membership_status,member
+check my subscription status,membership_status,member
+when do i need to renew,membership_status,member
+when will my membership expire,membership_status,member
+how many days left on my subscription,membership_status,member
+am i still an active member,membership_status,member
+is my gym membership valid,membership_status,member
+how much time do i have left,membership_status,member
+whens my plan ending,membership_status,member
+i want to check my membership,membership_status,member
+whats my membership status,membership_status,member
+tell me about my current plan,membership_status,member
+am i still good to go to the gym,membership_status,member
+is my account still active,membership_status,member
+how long until my membership runs out,membership_status,member
+wen does my membershp expire,membership_status,member
+membership status please,membership_status,member
+how many times did i go to the gym this month,my_attendance,member
+show my attendance history,my_attendance,member
+how many check ins do i have this week,my_attendance,member
+whats my attendance record,my_attendance,member
+did i check in yesterday,my_attendance,member
+how often do i visit the gym,my_attendance,member
+show me my visits this month,my_attendance,member
+how many gym sessions have i had,my_attendance,member
+whens the last time i checked in,my_attendance,member
+my attendance please,my_attendance,member
+how many days have i gone this month,my_attendance,member
+did i go to the gym last week,my_attendance,member
+show my checkin history,my_attendance,member
+whats my visit count,my_attendance,member
+how consistent have i been going,my_attendance,member
+gym visits this month,my_attendance,member
+my checkin record,my_attendance,member
+how many times have i been to the gym,my_attendance,member
+how much do i owe,my_billing,member
+whats my outstanding balance,my_billing,member
+when is my next payment due,my_billing,member
+show my payment history,my_billing,member
+how much did i pay last month,my_billing,member
+do i have any unpaid bills,my_billing,member
+whats my balance,my_billing,member
+how much is my next payment,my_billing,member
+when do i need to pay,my_billing,member
+show me my billing details,my_billing,member
+do i owe anything right now,my_billing,member
+whats due on my account,my_billing,member
+my payment status please,my_billing,member
+how much money do i owe the gym,my_billing,member
+when is my bill due,my_billing,member
+show my transaction history,my_billing,member
+whats my current bill,my_billing,member
+do i have outstanding fees,my_billing,member
+what classes are available today,class_schedule,member
+when is the yoga class,class_schedule,member
+whats the schedule for tomorrow,class_schedule,member
+is there a spin class this evening,class_schedule,member
+what classes do you have this week,class_schedule,member
+when does zumba start,class_schedule,member
+show me todays class schedule,class_schedule,member
+whats on the schedule tomorrow,class_schedule,member
+is there a pilates class today,class_schedule,member
+what time is the boxing class,class_schedule,member
+class times please,class_schedule,member
+whats happening at the gym today,class_schedule,member
+any classes this weekend,class_schedule,member
+when is the next hiit session,class_schedule,member
+show class schedule,class_schedule,member
+what time does yoga start,class_schedule,member
+whats the class lineup for today,class_schedule,member
+what time does the gym open,gym_hours,member
+what time does the gym close,gym_hours,member
+are you open on sunday,gym_hours,member
+what are your operating hours,gym_hours,member
+what time do you close today,gym_hours,member
+are you guys open right now,gym_hours,member
+whats your schedule for holidays,gym_hours,member
+what time can i come in,gym_hours,member
+are you open on weekends,gym_hours,member
+whens the gym open till,gym_hours,member
+what hours are you open,gym_hours,member
+is the gym open today,gym_hours,member
+when do you close on fridays,gym_hours,member
+opening hours please,gym_hours,member
+how late are you open,gym_hours,member
+how do i update my profile,account_help,member
+how do i change my password,account_help,member
+how do i cancel my membership,account_help,member
+i want to upgrade my plan,account_help,member
+how can i edit my information,account_help,member
+i forgot my password,account_help,member
+how do i change my email,account_help,member
+i want to downgrade my membership,account_help,member
+how do i update my phone number,account_help,member
+can i pause my membership,account_help,member
+how do i freeze my account,account_help,member
+i need to change my plan,account_help,member
+how do i reset my login,account_help,member
+i want to switch membership types,account_help,member
+how do i delete my account,account_help,member
+help me update my details,account_help,member
+hello,greeting,member
+hi there,greeting,member
+good morning,greeting,member
+hey,greeting,member
+good afternoon,greeting,member
+yo,greeting,member
+hiya,greeting,member
+whats up,greeting,member
+hello there,greeting,member
+hey there,greeting,member
+good evening,greeting,member
+hi assistant,greeting,member
+thanks,thanks,member
+thank you,thanks,member
+appreciate it,thanks,member
+thanks a lot,thanks,member
+thank you so much,thanks,member
+cool thanks,thanks,member
+ty,thanks,member
+appreciate the help,thanks,member
+thanks for that,thanks,member
+great thank you,thanks,member
+how many people are in the gym right now,current_occupancy,admin
+whats the current occupancy,current_occupancy,admin
+how busy is it right now,current_occupancy,admin
+live headcount please,current_occupancy,admin
+how many people are checked in right now,current_occupancy,admin
+current gym capacity,current_occupancy,admin
+whats the headcount right now,current_occupancy,admin
+how crowded is it currently,current_occupancy,admin
+how full is the gym right now,current_occupancy,admin
+real time occupancy please,current_occupancy,admin
+how many members are inside right now,current_occupancy,admin
+whats the live count,current_occupancy,admin
+current number of people at the gym,current_occupancy,admin
+whats the busiest hour today,peak_hours_analytics,admin
+when is the gym busiest,peak_hours_analytics,admin
+show me peak hours this week,peak_hours_analytics,admin
+what time do we get the most traffic,peak_hours_analytics,admin
+whats our peak time today,peak_hours_analytics,admin
+when do we get the most members,peak_hours_analytics,admin
+show peak hour analytics,peak_hours_analytics,admin
+whats the rush hour for the gym,peak_hours_analytics,admin
+busiest time of day,peak_hours_analytics,admin
+when are we most crowded,peak_hours_analytics,admin
+peak hours report please,peak_hours_analytics,admin
+what hour has the most checkins,peak_hours_analytics,admin
+how many renewals are due this week,renewals_due,admin
+show pending renewals,renewals_due,admin
+which members need to renew soon,renewals_due,admin
+list expiring memberships,renewals_due,admin
+how many memberships are expiring soon,renewals_due,admin
+show renewals coming up,renewals_due,admin
+whos due for renewal,renewals_due,admin
+upcoming membership expirations,renewals_due,admin
+renewal report please,renewals_due,admin
+how many members expire this month,renewals_due,admin
+list members due to renew,renewals_due,admin
+whats our revenue this month,revenue_report,admin
+show total income this month,revenue_report,admin
+how much did we earn this week,revenue_report,admin
+give me the revenue breakdown,revenue_report,admin
+whats our total earnings,revenue_report,admin
+how much money did we make this month,revenue_report,admin
+revenue report please,revenue_report,admin
+show income for this period,revenue_report,admin
+whats our monthly revenue,revenue_report,admin
+total sales this month,revenue_report,admin
+how much has the gym earned,revenue_report,admin
+how many members do we have,member_count,admin
+total active members right now,member_count,admin
+whats our membership count,member_count,admin
+how many active memberships do we have,member_count,admin
+total number of members,member_count,admin
+member count please,member_count,admin
+how many people are members right now,member_count,admin
+whats our total membership base,member_count,admin
+current member total,member_count,admin
+show churn rate this month,churn_analytics,admin
+how many members cancelled this month,churn_analytics,admin
+whats our retention rate,churn_analytics,admin
+how many people left this month,churn_analytics,admin
+show cancellation stats,churn_analytics,admin
+whats our member churn,churn_analytics,admin
+how many cancellations this month,churn_analytics,admin
+retention report please,churn_analytics,admin
+how many members did we lose,churn_analytics,admin
+predict attendance for next week,attendance_forecast,admin
+forecast gym traffic for tomorrow,attendance_forecast,admin
+whats the predicted attendance,attendance_forecast,admin
+give me an attendance forecast,attendance_forecast,admin
+predict how busy well be tomorrow,attendance_forecast,admin
+forecast next weeks turnout,attendance_forecast,admin
+whats the traffic prediction,attendance_forecast,admin
+expected attendance next week,attendance_forecast,admin
+project attendance for the weekend,attendance_forecast,admin
+hello admin dashboard,greeting,admin
+hi,greeting,admin
+good morning team,greeting,admin
+hey there,greeting,admin
+whats up,greeting,admin
+good afternoon,greeting,admin
+hiya,greeting,admin
+thanks for the info,thanks,admin
+thank you for the report,thanks,admin
+appreciate the update,thanks,admin
+thanks a lot,thanks,admin
+great thanks,thanks,admin
+how busy will it be tmrw,attendance_forecast,admin
+will it be crowded next monday,attendance_forecast,admin
+attendance forcast for this week,attendance_forecast,admin
+how many members expected today,attendance_forecast,admin
+gym busy hours prediction,attendance_forecast,admin
+show me attendance projection,attendance_forecast,admin
+predicted turnout for saturday,attendance_forecast,admin
+how crowded will next week be,attendance_forecast,admin
+estimate visitors for the weekend,attendance_forecast,admin
+wat will attendance look like tomorow,attendance_forecast,admin
+can you predict next months foot traffic,attendance_forecast,admin
+give me a heads up on expected crowd size,attendance_forecast,admin
+member churn numbers please,churn_analytics,admin
+how many people quit this month,churn_analytics,admin
+show me who unsubscribed recently,churn_analytics,admin
+cancellation rate this quarter,churn_analytics,admin
+how many memberships were terminated,churn_analytics,admin
+hows our retention looking,churn_analytics,admin
+how many walked away this month,churn_analytics,admin
+attrition report please,churn_analytics,admin
+churn stats for this period,churn_analytics,admin
+how many drop offs did we have,churn_analytics,admin
+give me the cancellation breakdown,churn_analytics,admin
+how many people are signed up,member_count,admin
+total members enrolled,member_count,admin
+headcount of active memberships,member_count,admin
+gimme the current member total,member_count,admin
+size of our member base,member_count,admin
+how many subscribers do we have,member_count,admin
+number of enrolled members right now,member_count,admin
+total signups so far,member_count,admin
+how big is our membership base,member_count,admin
+hows our member count looking,member_count,admin
+how much cash came in this month,revenue_report,admin
+earnings summary please,revenue_report,admin
+whats the income breakdown for this week,revenue_report,admin
+show profits for this quarter,revenue_report,admin
+how much did we bring in today,revenue_report,admin
+financial summary for this month,revenue_report,admin
+gimme the sales numbers,revenue_report,admin
+hows revenue looking this month,revenue_report,admin
+who needs to renew this week,renewals_due,admin
+show me upcoming renewals,renewals_due,admin
+memberships expiring soon list,renewals_due,admin
+how many people need to renew,renewals_due,admin
+whos coming up for renewal,renewals_due,admin
+expiring plans this month,renewals_due,admin
+renewal list please,renewals_due,admin
+show me who needs to resubscribe,renewals_due,admin
+what hour is craziest here,peak_hours_analytics,admin
+busiest time slot today,peak_hours_analytics,admin
+when do we get slammed,peak_hours_analytics,admin
+show me our busiest window,peak_hours_analytics,admin
+peak traffic hour please,peak_hours_analytics,admin
+whats the rush hour today,peak_hours_analytics,admin
+when is foot traffic highest,peak_hours_analytics,admin
+hows the gym looking right now,current_occupancy,admin
+how many people are working out right now,current_occupancy,admin
+gym floor headcount,current_occupancy,admin
+how packed is it right now,current_occupancy,admin
+current people count please,current_occupancy,admin
+wen do i need to renew,membership_status,member
+hows my membership looking,membership_status,member
+am i good for the month,membership_status,member
+membershp status pls,membership_status,member
+do i still have an active plan,membership_status,member
+hows my account standing,membership_status,member
+hows my gym attendance looking,my_attendance,member
+how many times have i shown up,my_attendance,member
+atendance history pls,my_attendance,member
+did i miss any days this month,my_attendance,member
+wen was my last checkin,my_attendance,member
+hows my balance looking,my_billing,member
+wat do i owe rn,my_billing,member
+billing status pls,my_billing,member
+am i all paid up,my_billing,member
+do i have any pending charges,my_billing,member
+wats on today,class_schedule,member
+any good classes tonight,class_schedule,member
+schedule for this week pls,class_schedule,member
+is there a spin class tmrw,class_schedule,member
+whats happening in the studio today,class_schedule,member
+r yall open rn,gym_hours,member
+hours today pls,gym_hours,member
+closing time today,gym_hours,member
+open on holidays,gym_hours,member
+wen do u guys close,gym_hours,member
+cant log in help,account_help,member
+need to reset my pw,account_help,member
+wanna cancel my plan,account_help,member
+how do i switch plans,account_help,member
+update my info pls,account_help,member
+morning,greeting,member
+sup,greeting,member
+yo whats good,greeting,member
+evening,greeting,admin
+hey admin,greeting,admin
+hru,greeting,member
+tysm,thanks,member
+appreciate u,thanks,member
+thx,thanks,member
+perfect thank you,thanks,admin
+nice thanks for that,thanks,admin
