@@ -83,8 +83,8 @@ class Sidebar extends StatelessWidget {
     _NavItemData(Icons.qr_code_scanner_rounded, 'Attendance'),
     _NavItemData(Icons.center_focus_strong_rounded, 'Check-In'),
     _NavItemData(Icons.credit_card_outlined, 'Billing'),
+    _NavItemData(Icons.receipt_long_outlined, 'Pending Payments'),
     _NavItemData(Icons.inventory_2_outlined, 'Inventory'),
-    _NavItemData(Icons.chat_bubble_outline_rounded, 'Chatbot'),
     _NavItemData(Icons.settings_outlined, 'Settings'),
   ];
 

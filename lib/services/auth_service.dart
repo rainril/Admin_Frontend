@@ -105,68 +105,80 @@ class AuthService {
 
   // FORGOT PASSWORD - request code
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/forgot-password'),
-      headers: {'Accept': 'application/json'},
-      body: {'email': email},
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/forgot-password'),
+        headers: {'Accept': 'application/json'},
+        body: {'email': email},
+      );
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      return {'success': true, 'message': data['message']};
-    } else {
-      return {'success': false, 'message': data['message'] ?? 'Something went wrong'};
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      } else {
+        return {'success': false, 'message': data['message'] ?? 'Something went wrong'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Unable to reach the server. Please check your connection.'};
     }
   }
 
   // VERIFY RESET CODE
   static Future<Map<String, dynamic>> verifyResetCode(String email, String code) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/verify-reset-code'),
-      headers: {'Accept': 'application/json'},
-      body: {
-        'email': email,
-        'code': code,
-      },
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/verify-reset-code'),
+        headers: {'Accept': 'application/json'},
+        body: {
+          'email': email,
+          'code': code,
+        },
+      );
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      return {'success': true, 'message': data['message']};
-    } else {
-      String errorMsg = data['message'] ?? 'Invalid code';
-      if (data['errors'] != null && data['errors']['code'] != null) {
-        errorMsg = data['errors']['code'][0];
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      } else {
+        String errorMsg = data['message'] ?? 'Invalid code';
+        if (data['errors'] != null && data['errors']['code'] != null) {
+          errorMsg = data['errors']['code'][0];
+        }
+        return {'success': false, 'message': errorMsg};
       }
-      return {'success': false, 'message': errorMsg};
+    } catch (e) {
+      return {'success': false, 'message': 'Unable to reach the server. Please check your connection.'};
     }
   }
 
   // RESET PASSWORD - submit code + new password
   static Future<Map<String, dynamic>> resetPassword(
       String email, String code, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/reset-password'),
-      headers: {'Accept': 'application/json'},
-      body: {
-        'email': email,
-        'code': code,
-        'password': password,
-      },
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/reset-password'),
+        headers: {'Accept': 'application/json'},
+        body: {
+          'email': email,
+          'code': code,
+          'password': password,
+        },
+      );
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      return {'success': true, 'message': data['message']};
-    } else {
-      String errorMsg = data['message'] ?? 'Reset failed';
-      if (data['errors'] != null && data['errors']['code'] != null) {
-        errorMsg = data['errors']['code'][0];
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      } else {
+        String errorMsg = data['message'] ?? 'Reset failed';
+        if (data['errors'] != null && data['errors']['code'] != null) {
+          errorMsg = data['errors']['code'][0];
+        }
+        return {'success': false, 'message': errorMsg};
       }
-      return {'success': false, 'message': errorMsg};
+    } catch (e) {
+      return {'success': false, 'message': 'Unable to reach the server. Please check your connection.'};
     }
   }
 }

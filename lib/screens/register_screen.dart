@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
+import '../theme/auth_theme.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 
@@ -18,7 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  String _adminLevel = 'staff'; // default value
+  String _adminLevel = 'staff';
   bool _obscure = true;
   bool _obscureConfirm = true;
   bool _loading = false;
@@ -83,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -98,112 +100,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isWide = width >= 900;
 
     return Scaffold(
-      body: isWide
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(flex: 5, child: _buildInfoPanel()),
-                Expanded(
-                  flex: 6,
-                  child: Center(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: _buildFormPanel(),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: isWide
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(flex: 6, child: _buildInfoPanel()),
+                  Expanded(
+                    flex: 5,
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(vertical: 40),
+                        child: _buildFormPanel(),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildInfoPanel(compact: true),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
-                    child: _buildFormPanel(),
-                  ),
                 ],
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildInfoPanel(compact: true),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+                      child: _buildFormPanel(),
+                    ),
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 
   Widget _buildInfoPanel({bool compact = false}) {
-    return Container(
-      width: double.infinity,
-      color: AppColors.dark,
-      padding: EdgeInsets.fromLTRB(40, compact ? 40 : 60, 40, compact ? 32 : 40),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: compact ? 64 : 90,
-            height: compact ? 64 : 90,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage('assets/primefit_logo.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          RichText(
-            text: TextSpan(
-              style: TextStyle(
-                  fontSize: compact ? 26 : 34, fontWeight: FontWeight.bold),
-              children: const [
-                TextSpan(text: 'Prime', style: TextStyle(color: AppColors.cyan)),
-                TextSpan(text: 'Fit', style: TextStyle(color: AppColors.gold)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text('Staff Portal',
-              style: TextStyle(color: Colors.white70, fontSize: 16)),
-          if (!compact) ...[
-            const SizedBox(height: 16),
-            const Text(
-              'Create your staff or owner account to manage members, billing, inventory, and AI-powered analytics from one place.',
-              style: TextStyle(color: Colors.white60, height: 1.5),
-            ),
-            const SizedBox(height: 28),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white12),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.shield_outlined, color: AppColors.gold, size: 18),
-                      SizedBox(width: 8),
-                      Text('Restricted Access',
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'This portal is for authorized PrimeFit staff only. Unauthorized access attempts are logged and monitored.',
-                    style:
-                        TextStyle(color: Colors.white54, height: 1.4, fontSize: 13),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            const Text('© 2026 PrimeFit Fitness Gym',
-                style: TextStyle(color: Colors.white38, fontSize: 12)),
-          ],
-        ],
-      ),
-    );
+    return buildAuthInfoPanel(compact: compact);
   }
 
   Widget _buildFormPanel() {
@@ -227,13 +158,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: const Icon(Icons.person_add_alt_1_outlined, color: AppColors.gold),
                   ),
                   const SizedBox(width: 14),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Create Account',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                      Text('Sign up as staff or owner',
-                          style: TextStyle(color: AppColors.textMuted)),
+                      Text('Create Account', style: AuthFonts.heading(size: 22)),
+                      Text('Sign up as staff or owner', style: AuthFonts.subtitle()),
                     ],
                   ),
                 ],
@@ -273,10 +202,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 20),
 
-              const Text('Role', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text('Role', style: AuthFonts.label()),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 initialValue: _adminLevel,
+                decoration: authPillDecoration(hint: ''),
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
                 items: const [
                   DropdownMenuItem(value: 'staff', child: Text('Staff')),
                   DropdownMenuItem(value: 'owner', child: Text('Owner')),
@@ -287,17 +218,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 20),
 
-              const Text('Password', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text('Password', style: AuthFonts.label()),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Password is required';
                   if (v.length < 6) return 'Minimum 6 characters';
                   return null;
                 },
-                decoration: InputDecoration(
+                decoration: authPillDecoration(hint: 'Enter password').copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility,
                         color: AppColors.textMuted),
@@ -307,16 +239,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 20),
 
-              const Text('Confirm Password', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text('Confirm Password', style: AuthFonts.label()),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _confirmPasswordController,
                 obscureText: _obscureConfirm,
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Please confirm your password';
                   return null;
                 },
-                decoration: InputDecoration(
+                decoration: authPillDecoration(hint: 'Confirm password').copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility,
                         color: AppColors.textMuted),
@@ -328,24 +261,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _loading ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.dark,
                     foregroundColor: Colors.white,
-                    shape:
-                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: _loading
                       ? const SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                         )
-                      : const Text('Create Account',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      : Text('Create Account', style: AuthFonts.button(size: 16)),
                 ),
               ),
               const SizedBox(height: 16),
@@ -357,15 +288,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       MaterialPageRoute(builder: (_) => const LoginScreen()),
                     );
                   },
-                  child: const Text.rich(
+                  child: Text.rich(
                     TextSpan(
                       text: 'Already have an account? ',
-                      style: TextStyle(color: AppColors.textMuted),
+                      style: AuthFonts.body(size: 13.5, color: const Color(0xFF6B7280)),
                       children: [
                         TextSpan(
                           text: 'Sign In',
-                          style: TextStyle(
-                              color: Color(0xFFB45309), fontWeight: FontWeight.w600),
+                          style: AuthFonts.link(size: 13.5, color: const Color(0xFFB45309), weight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -387,9 +317,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        Text(label, style: AuthFonts.label()),
         const SizedBox(height: 8),
-        TextFormField(controller: controller, validator: validator),
+        TextFormField(
+          controller: controller,
+          style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+          validator: validator,
+          decoration: authPillDecoration(hint: ''),
+        ),
       ],
     );
   }

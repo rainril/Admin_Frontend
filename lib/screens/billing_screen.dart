@@ -5,6 +5,7 @@ import '../services/payment_data.dart';
 import '../services/payment_service.dart';
 import '../services/attendance_service.dart';
 import '../services/earnings_pdf_service.dart';
+import '../services/current_user.dart';
 
 /// This screen was built with its own self-contained slate palette instead
 /// of the shared AppColors/AppTheme. Rather than rewiring every literal to
@@ -74,22 +75,6 @@ class BillingScreen extends StatefulWidget {
 
 class _BillingScreenState extends State<BillingScreen>
     with PollingScreenMixin<BillingScreen> {
-  final TextEditingController _customerNameController = TextEditingController();
-  final TextEditingController _planNameController = TextEditingController();
-  final TextEditingController _monthsController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-
-  String _selectedPaymentMethod = 'Cash';
-  final List<String> _paymentMethods = ['Cash', 'GCash', 'Maya', 'Bank Transfer'];
-
-  final Map<String, int> _fixedPrices = {
-    '4 months': 2400,
-    '5 months': 2800,
-    '7 months': 3500,
-    '1 year': 4800,
-  };
-
-  int _calculatedTotal = 0;
   bool _isSendingEmail = false;
 
   static const Map<String, List<Color>> _paymentStatusColors = {
@@ -111,8 +96,6 @@ class _BillingScreenState extends State<BillingScreen>
   @override
   void initState() {
     super.initState();
-    _planNameController.addListener(_updateTotal);
-    _monthsController.addListener(_updateTotal);
     PaymentData.instance.addListener(_onDataChanged);
   }
 
@@ -157,30 +140,12 @@ class _BillingScreenState extends State<BillingScreen>
 
   @override
   void dispose() {
-    _customerNameController.dispose();
-    _planNameController.dispose();
-    _monthsController.dispose();
-    _descriptionController.dispose();
     PaymentData.instance.removeListener(_onDataChanged);
     super.dispose();
   }
 
   void _onDataChanged() {
     if (mounted) setState(() {});
-  }
-
-  void _updateTotal() {
-    String plan = _planNameController.text.trim().toLowerCase();
-    int months = int.tryParse(_monthsController.text.trim()) ?? 0;
-    int basePrice = _fixedPrices[plan] ?? 0;
-
-    if (basePrice == 0 && plan.isNotEmpty) {
-      basePrice = 500;
-    }
-
-    setState(() {
-      _calculatedTotal = basePrice * months;
-    });
   }
 
   // ---------- Date/amount parsing helpers ----------
@@ -397,253 +362,6 @@ class _BillingScreenState extends State<BillingScreen>
     );
   }
 
-  void _showCreatePlanDialog(BuildContext context) {
-    setState(() {
-      _calculatedTotal = 0;
-      _selectedPaymentMethod = 'Cash';
-    });
-
-    final c = _BillingColors.of(context);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24.0),
-          ),
-          child: Container(
-            width: 480,
-            padding: const EdgeInsets.all(32.0),
-            decoration: BoxDecoration(
-              color: c.card,
-              borderRadius: BorderRadius.circular(24.0),
-            ),
-            child: StatefulBuilder(
-              builder: (context, setDialogState) {
-                _planNameController.addListener(() {
-                  if (dialogContext.mounted) setDialogState(() {});
-                });
-                _monthsController.addListener(() {
-                  if (dialogContext.mounted) setDialogState(() {});
-                });
-
-                return SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Create Membership Plan',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: c.heading),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close, color: c.placeholder),
-                            onPressed: () => Navigator.pop(dialogContext),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Customer Name',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.label),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _customerNameController,
-                        decoration: InputDecoration(
-                          hintText: 'e.g., John Doe',
-                          hintStyle: TextStyle(color: c.placeholder),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: c.border),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Plan Name',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.label),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _planNameController,
-                        decoration: InputDecoration(
-                          hintText: '4 months (₱2400), 5 months (₱2800), 7 months (₱3500), 1 year (₱4800)',
-                          hintStyle: TextStyle(color: c.placeholder, fontSize: 13),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: c.border),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Months',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.label),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _monthsController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: 'How many months? (e.g., 3)',
-                          hintStyle: TextStyle(color: c.placeholder),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: c.border),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Method of Payment',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.label),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        initialValue: _selectedPaymentMethod,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: c.border),
-                          ),
-                        ),
-                        items: _paymentMethods.map((String method) {
-                          return DropdownMenuItem<String>(
-                            value: method,
-                            child: Text(method, style: TextStyle(color: c.heading)),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            setDialogState(() {
-                              _selectedPaymentMethod = newValue;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Description',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.label),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _descriptionController,
-                        maxLines: 2,
-                        decoration: InputDecoration(
-                          hintText: "What's included...",
-                          hintStyle: TextStyle(color: c.placeholder),
-                          contentPadding: const EdgeInsets.all(16),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: c.border),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: c.subtleBg,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: c.border),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total Payables:',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: c.secondary),
-                            ),
-                            Text(
-                              _formatCurrency(_calculatedTotal),
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF00B4D8)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.section),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(dialogContext),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                side: BorderSide(color: c.border),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(color: c.label, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                String customerName = _customerNameController.text.trim();
-                                String planName = _planNameController.text.trim();
-
-                                if (customerName.isEmpty) customerName = 'Walk-in Customer';
-                                if (planName.isEmpty) planName = 'Custom';
-
-                                PaymentData.instance.addPayment({
-                                  'member': customerName,
-                                  'plan': planName,
-                                  'amount': _formatCurrency(_calculatedTotal),
-                                  'method': _selectedPaymentMethod,
-                                  'date': DateTime.now().toString().split(' ')[0],
-                                  'status': 'Pending',
-                                });
-
-                                _customerNameController.clear();
-                                _planNameController.clear();
-                                _monthsController.clear();
-                                _descriptionController.clear();
-
-                                Navigator.pop(dialogContext);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00B4D8),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              child: const Text(
-                                'Create Plan',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final c = _BillingColors.of(context);
@@ -655,7 +373,6 @@ class _BillingScreenState extends State<BillingScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -667,21 +384,6 @@ class _BillingScreenState extends State<BillingScreen>
                       style: AppTheme.pageSubtitle(context),
                     ),
                   ],
-                ),
-                ElevatedButton.icon(
-                  onPressed: () => _showCreatePlanDialog(context),
-                  icon: const Icon(Icons.add, color: Colors.white, size: 18),
-                  label: const Text(
-                    'Create Plan',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00B4D8),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.control)),
-                  ),
                 ),
               ],
             ),
@@ -742,13 +444,19 @@ class _BillingScreenState extends State<BillingScreen>
             const SizedBox(height: AppSpacing.section),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   'Membership Plan Payments',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: c.heading),
                 ),
-                ElevatedButton.icon(
+              ],
+            ),
+            if (CurrentUser.isOwner) const SizedBox(height: 8),
+            if (CurrentUser.isOwner)
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
                   onPressed: _isSendingEmail ? null : _exportEarningsStatement,
                   icon: const Icon(Icons.download, size: 16, color: Colors.white),
                   label: const Text('Export PDF', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -758,8 +466,7 @@ class _BillingScreenState extends State<BillingScreen>
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                   ),
                 ),
-              ],
-            ),
+              ),
             const SizedBox(height: 12),
             Container(
               width: double.infinity,

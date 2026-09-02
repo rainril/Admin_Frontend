@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/attendance_page.dart';
 import 'package:flutter_application_1/screens/login_screen.dart';
 import 'package:flutter_application_1/screens/qr_scanner_page.dart';
-import 'package:flutter_application_1/screens/app_shell.dart';
 import 'theme/app_theme.dart';
 import 'services/theme_controller.dart';
 
@@ -38,10 +37,6 @@ Widget _resolveInitialPage() {
     case '/attendance':
     case 'attendance':
       return const AttendancePage();
-
-    case '/chatbot':
-    case 'chatbot':
-      return const AppShell(initialIndex: 5);
 
     case '':
     case '/':

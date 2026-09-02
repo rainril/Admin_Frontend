@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/sidebar.dart';
+import '../widgets/floating_chatbot.dart';
 import '../widgets/tab_visibility.dart';
 import 'dashboard_screen.dart';
 import 'billing_screen.dart';
@@ -8,7 +9,7 @@ import 'attendance_page.dart';
 import 'scan_checkin_page.dart';
 import 'inventory_screen.dart';
 import 'settings_screen.dart';
-import 'chatbot_screen.dart';
+import 'pending_receipts_screen.dart';
 import 'login_screen.dart';
 import '../services/current_user.dart';
 
@@ -24,7 +25,7 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _index = 0;
 
-  static const _titles = ['Dashboard', 'Attendance', 'Scan', 'Billing', 'Inventory', 'Chatbot', 'Settings'];
+  static const _titles = ['Dashboard', 'Attendance', 'Scan', 'Billing', 'Pending Payments', 'Inventory', 'Settings'];
   static const int scanIndex = 2;
 
   @override
@@ -53,8 +54,8 @@ class _AppShellState extends State<AppShell> {
         _tab(1, AttendancePage(onGoToScan: () => _onSelect(scanIndex))),
         _tab(2, const ScanCheckInPage()),
         _tab(3, const BillingScreen()),
-        _tab(4, const InventoryScreen()),
-        _tab(5, const ChatbotScreen()),
+        _tab(4, const PendingReceiptsScreen()),
+        _tab(5, const InventoryScreen()),
         _tab(6, const SettingsScreen()),
       ];
 
@@ -63,50 +64,54 @@ class _AppShellState extends State<AppShell> {
     final isWide = MediaQuery.of(context).size.width >= 900;
 
     if (isWide) {
-      return Scaffold(
-        body: Row(
-          children: [
-            Sidebar(currentIndex: _index, onSelect: _onSelect, onLogout: _logout),
-            Expanded(
-              child: Container(
-                color: AppTheme.pageBackground(context),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: IndexedStack(
-                      index: _index,
-                      children: _screens,
+      return FloatingChatbotOverlay(
+        child: Scaffold(
+          body: Row(
+            children: [
+              Sidebar(currentIndex: _index, onSelect: _onSelect, onLogout: _logout),
+              Expanded(
+                child: Container(
+                  color: AppTheme.pageBackground(context),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: IndexedStack(
+                        index: _index,
+                        children: _screens,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_titles[_index]),
-      ),
-      drawer: Drawer(
-        child: Sidebar(
-          currentIndex: _index,
-          onSelect: (i) {
-            setState(() => _index = i);
-            Navigator.of(context).pop();
-          },
-          onLogout: _logout,
+    return FloatingChatbotOverlay(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_titles[_index]),
         ),
-      ),
-      body: Container(
-        color: AppTheme.pageBackground(context),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: IndexedStack(
-            index: _index,
-            children: _screens,
+        drawer: Drawer(
+          child: Sidebar(
+            currentIndex: _index,
+            onSelect: (i) {
+              setState(() => _index = i);
+              Navigator.of(context).pop();
+            },
+            onLogout: _logout,
+          ),
+        ),
+        body: Container(
+          color: AppTheme.pageBackground(context),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: IndexedStack(
+              index: _index,
+              children: _screens,
+            ),
           ),
         ),
       ),

@@ -41,26 +41,30 @@ class SettingsService {
     required String currentPassword,
     required String newPassword,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/change-password'),
-      headers: {'Accept': 'application/json'},
-      body: {
-        'accountId': accountId.toString(),
-        'currentPassword': currentPassword,
-        'newPassword': newPassword,
-      },
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/change-password'),
+        headers: {'Accept': 'application/json'},
+        body: {
+          'accountId': accountId.toString(),
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        },
+      );
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      return {'success': true, 'message': data['message']};
-    } else {
-      String errorMsg = data['message'] ?? 'Failed to change password';
-      if (data['errors'] != null && data['errors']['currentPassword'] != null) {
-        errorMsg = data['errors']['currentPassword'][0];
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      } else {
+        String errorMsg = data['message'] ?? 'Failed to change password';
+        if (data['errors'] != null && data['errors']['currentPassword'] != null) {
+          errorMsg = data['errors']['currentPassword'][0];
+        }
+        return {'success': false, 'message': errorMsg};
       }
-      return {'success': false, 'message': errorMsg};
+    } catch (e) {
+      return {'success': false, 'message': 'Unable to reach the server. Please check your connection.'};
     }
   }
 }
