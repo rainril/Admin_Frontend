@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 /// Laravel API. If you already have a shared ApiConfig/api constants file,
 /// delete this class and import that one instead.
 class ApiConfig {
-  static const String baseUrl = 'http://localhost:8000/api'; // 
+  static const String baseUrl = 'https://admin-primefit-backend.onrender.com/api'; // 
   
 }
 
