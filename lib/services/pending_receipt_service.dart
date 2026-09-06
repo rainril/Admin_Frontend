@@ -7,9 +7,9 @@ import 'package:http/http.dart' as http;
 /// host the other services already use (`PaymentService.baseUrl`,
 /// `ApiConfig.baseUrl` in `dashboard_analytics_service.dart`).
 class BillingApiConfig {
-     static const String host = 'http://127.0.0.1:8080';
+  static const String host = 'http://127.0.0.1';
 
-  static String get endpoint => '$host/billing_api.php';
+  static String get endpoint => '$host/memberaccount/billing_api.php';
 
   /// Turn a receipt's `receipt_url` (which may come back absolute, or relative
   /// to the backend root) into a full, loadable image URL.
