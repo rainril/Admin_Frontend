@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/merch_sale_service.dart';
 import '../theme/app_theme.dart';
 
@@ -21,8 +21,8 @@ class MerchSalesPanel extends StatefulWidget {
 }
 
 class MerchSalesPanelState extends State<MerchSalesPanel> {
-  static const Color accent = Color(0xFF14B8C6);
-  static const Color mutedText = Color(0xFF8A8F98);
+  static const Color accent = AppColors.cyan;
+  static const Color mutedText = AppColors.textMuted;
 
   List<MerchSale> _pending = [];
   List<MerchSale> _recent = [];
@@ -58,7 +58,7 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(result.message),
-        backgroundColor: result.success ? null : Colors.red.shade600,
+        backgroundColor: result.success ? null : AppColors.danger,
       ),
     );
 
@@ -78,7 +78,7 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Void', style: TextStyle(color: Colors.white)),
           ),
@@ -96,7 +96,7 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(result.message.isEmpty ? 'Sale voided.' : result.message),
-        backgroundColor: result.success ? null : Colors.red.shade600,
+        backgroundColor: result.success ? null : AppColors.danger,
       ),
     );
 
@@ -135,11 +135,11 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3E2),
+                          color: AppColors.warningBg,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text('${_pending.length}',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFCA8A04))),
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.warning)),
                       ),
                     ],
                   ],
@@ -213,7 +213,7 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
                 OutlinedButton(
                   onPressed: () => _void(sale),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
+                    foregroundColor: AppColors.danger,
                     side: const BorderSide(color: Color(0xFFFCA5A5)),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

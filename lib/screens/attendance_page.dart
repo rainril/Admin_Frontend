@@ -19,8 +19,8 @@ class AttendancePage extends StatefulWidget {
 
 class _AttendancePageState extends State<AttendancePage>
     with PollingScreenMixin<AttendancePage> {
-  static const Color accent = Color(0xFF14B8C6);
-  static const Color mutedText = Color(0xFF8A8F98);
+  static const Color accent = AppColors.cyan;
+  static const Color mutedText = AppColors.textMuted;
 
   String _searchQuery = '';
   String _statusFilter = 'All Status';
@@ -198,9 +198,9 @@ class _AttendancePageState extends State<AttendancePage>
             if (_pendingApprovals.isNotEmpty)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: const Color(0xFFFDEBEC), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: AppColors.dangerBg, borderRadius: BorderRadius.circular(20)),
                 child: Text('${_pendingApprovals.length}',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFDC2626))),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.danger)),
               ),
           ],
         ),
@@ -260,7 +260,7 @@ class _AttendancePageState extends State<AttendancePage>
           Icon(
             type == 'delete' ? Icons.delete_outline : Icons.edit_outlined,
             size: 18,
-            color: type == 'delete' ? const Color(0xFFDC2626) : const Color(0xFFCA8A04),
+            color: type == 'delete' ? AppColors.danger : AppColors.warning,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -278,8 +278,8 @@ class _AttendancePageState extends State<AttendancePage>
           OutlinedButton(
             onPressed: () => _onRejectApproval(a),
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFFDC2626),
-              side: const BorderSide(color: Color(0xFFDC2626)),
+              foregroundColor: AppColors.danger,
+              side: const BorderSide(color: AppColors.danger),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             ),
             child: const Text('Reject'),
@@ -440,9 +440,9 @@ class _AttendancePageState extends State<AttendancePage>
   }
 
   static const Map<String, List<Color>> _statusColors = {
-    'Paid': [Color(0xFFE6F7ED), Color(0xFF16A34A)],
-    'Pending': [Color(0xFFFEF3E2), Color(0xFFCA8A04)],
-    'Failed': [Color(0xFFFDEBEC), Color(0xFFDC2626)],
+    'Paid': [AppColors.successBg, AppColors.success],
+    'Pending': [AppColors.warningBg, AppColors.warning],
+    'Failed': [AppColors.dangerBg, AppColors.danger],
   };
 
   Widget _buildWalkInRow(Map<String, dynamic> r, [int index = 0]) {
@@ -592,9 +592,9 @@ class _AttendancePageState extends State<AttendancePage>
   }
 
   static const Map<String, List<Color>> _memberStatusColors = {
-    'Present': [Color(0xFFE6F7ED), Color(0xFF16A34A)],
-    'Late': [Color(0xFFFEF3E2), Color(0xFFCA8A04)],
-    'Absent': [Color(0xFFFDEBEC), Color(0xFFDC2626)],
+    'Present': [AppColors.successBg, AppColors.success],
+    'Late': [AppColors.warningBg, AppColors.warning],
+    'Absent': [AppColors.dangerBg, AppColors.danger],
   };
 
   Widget _buildMemberRow(Map<String, dynamic> r, [int index = 0]) {
@@ -1033,7 +1033,7 @@ class _AttendancePageState extends State<AttendancePage>
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () async {
               Navigator.pop(context);
 

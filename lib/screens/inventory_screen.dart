@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../theme/app_theme.dart';
 import '../services/merch_item_service.dart';
@@ -11,6 +11,7 @@ import '../widgets/record_sale_dialog.dart';
 import '../widgets/pending_merch_sales_widget.dart';
 import '../widgets/deletion_requests_panel.dart';
 import '../widgets/tab_visibility.dart';
+import '../widgets/state_views.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -184,7 +185,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                   _loadMerchItems();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Failed to update price.'), backgroundColor: Colors.red),
+                    const SnackBar(content: Text('Failed to update price.'), backgroundColor: AppColors.danger),
                   );
                 }
               },
@@ -227,7 +228,7 @@ class _InventoryScreenState extends State<InventoryScreen>
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message), backgroundColor: result.success ? null : Colors.red.shade600),
+        SnackBar(content: Text(result.message), backgroundColor: result.success ? null : AppColors.danger),
       );
       return;
     }
@@ -241,7 +242,7 @@ class _InventoryScreenState extends State<InventoryScreen>
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Remove', style: TextStyle(color: Colors.white)),
           ),
@@ -260,7 +261,7 @@ class _InventoryScreenState extends State<InventoryScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.message.isEmpty ? 'Failed to remove item.' : result.message),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
     }
@@ -315,7 +316,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Add Equipment', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, color: Colors.grey)),
+                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, color: AppColors.textMuted)),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -394,7 +395,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('Failed to add equipment.'),
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: AppColors.danger,
                                   ),
                                 );
                               }
@@ -442,7 +443,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Add Merch', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, color: Colors.grey)),
+                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, color: AppColors.textMuted)),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -542,7 +543,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('Failed to add merch — check that the barcode is unique.'),
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: AppColors.danger,
                                   ),
                                 );
                               }
@@ -646,7 +647,7 @@ class _InventoryScreenState extends State<InventoryScreen>
               child: Icon(
                 icon,
                 size: 18,
-                color: isSelected ? AppColors.inventoryPrimary : Colors.grey[500],
+                color: isSelected ? AppColors.inventoryPrimary : AppTheme.textMuted(context),
               ),
             ),
             const SizedBox(width: 8),
@@ -655,7 +656,7 @@ class _InventoryScreenState extends State<InventoryScreen>
               curve: Curves.easeInOutCubic,
               style: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? AppColors.inventoryPrimary : Colors.grey[600],
+                color: isSelected ? AppColors.inventoryPrimary : AppTheme.textMuted(context),
               ),
               child: Text(label),
             ),
@@ -735,7 +736,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       _loadEquipmentItems();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to update equipment.'), backgroundColor: Colors.red),
+                        const SnackBar(content: Text('Failed to update equipment.'), backgroundColor: AppColors.danger),
                       );
                     }
                   },
@@ -756,7 +757,7 @@ class _InventoryScreenState extends State<InventoryScreen>
       _loadEquipmentItems();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message.isEmpty ? 'Failed to update status.' : result.message), backgroundColor: Colors.red),
+        SnackBar(content: Text(result.message.isEmpty ? 'Failed to update status.' : result.message), backgroundColor: AppColors.danger),
       );
     }
   }
@@ -790,7 +791,7 @@ class _InventoryScreenState extends State<InventoryScreen>
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message), backgroundColor: result.success ? null : Colors.red.shade600),
+        SnackBar(content: Text(result.message), backgroundColor: result.success ? null : AppColors.danger),
       );
       return;
     }
@@ -803,7 +804,7 @@ class _InventoryScreenState extends State<InventoryScreen>
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Remove', style: TextStyle(color: Colors.white)),
           ),
@@ -819,7 +820,7 @@ class _InventoryScreenState extends State<InventoryScreen>
       _loadEquipmentItems();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message.isEmpty ? 'Failed to remove equipment.' : result.message), backgroundColor: Colors.red),
+        SnackBar(content: Text(result.message.isEmpty ? 'Failed to remove equipment.' : result.message), backgroundColor: AppColors.danger),
       );
     }
   }
@@ -841,9 +842,9 @@ class _InventoryScreenState extends State<InventoryScreen>
             spacing: 16, runSpacing: 16,
             children: [              
               _buildStatCard('Total Equipment', totalEquipmentQty.toString(), Icons.widgets_outlined, AppColors.inventoryPrimary.withValues(alpha: 0.1), AppColors.inventoryPrimary, cardWidth),
-              _buildStatCard('Available', availableCount.toString(), Icons.check_circle_outline, const Color(0xFFE8F5E9), Colors.green, cardWidth),
-              _buildStatCard('In Maintenance', maintenanceCount.toString(), Icons.build_outlined, const Color(0xFFFFF3E0), Colors.orange, cardWidth),
-              _buildStatCard('Damaged', damagedCount.toString(), Icons.cancel_outlined, const Color(0xFFFFEBEE), Colors.red, cardWidth),
+              _buildStatCard('Available', availableCount.toString(), Icons.check_circle_outline, AppColors.successBg, AppColors.success, cardWidth),
+              _buildStatCard('In Maintenance', maintenanceCount.toString(), Icons.build_outlined, AppColors.warningBg, AppColors.warning, cardWidth),
+              _buildStatCard('Damaged', damagedCount.toString(), Icons.cancel_outlined, AppColors.dangerBg, AppColors.danger, cardWidth),
             ],
           );
         }),
@@ -863,7 +864,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                     selectedColor: AppColors.inventoryPrimary,
                     backgroundColor: Theme.of(context).cardColor,
                     labelStyle: TextStyle(color: isSelected ? Colors.white : AppTheme.heading(context)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: isSelected ? Colors.transparent : Colors.grey[300]!)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: isSelected ? Colors.transparent : AppTheme.border(context))),
                     onSelected: (selected) { if (selected) setState(() => _equipmentFilter = filter); },
                   );
                 }).toList(),
@@ -880,17 +881,12 @@ class _InventoryScreenState extends State<InventoryScreen>
         ),
         const SizedBox(height: 16),
         if (_loadingEquipment)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: CircularProgressIndicator()),
-          )
+          const LoadingState(padding: EdgeInsets.symmetric(vertical: 40))
         else if (filtered.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40),
-            child: Center(
-              child: Text('No equipment found for this filter.', style: TextStyle(color: Colors.grey[600])),
-            ),
-          )
+          const EmptyState(
+            icon: Icons.fitness_center,
+            padding: EdgeInsets.symmetric(vertical: 40),
+            message: 'No equipment found for this filter.')
         else
           LayoutBuilder(builder: (context, constraints) {
             final crossAxisCount = constraints.maxWidth >= 1100
@@ -915,9 +911,9 @@ class _InventoryScreenState extends State<InventoryScreen>
   }
 
   Widget _buildEquipmentCard(EquipmentItem e) {
-    Color sColor = Colors.green; Color sBg = const Color(0xFFE8F5E9); IconData sIcon = Icons.check_circle_outline;
-    if (e.status == 'Maintenance') { sColor = Colors.orange; sBg = const Color(0xFFFFF3E0); sIcon = Icons.build_outlined; }
-    if (e.status == 'Damaged') { sColor = Colors.red; sBg = const Color(0xFFFFEBEE); sIcon = Icons.cancel_outlined; }
+    Color sColor = AppColors.success; Color sBg = AppColors.successBg; IconData sIcon = Icons.check_circle_outline;
+    if (e.status == 'Maintenance') { sColor = AppColors.warning; sBg = AppColors.warningBg; sIcon = Icons.build_outlined; }
+    if (e.status == 'Damaged') { sColor = AppColors.danger; sBg = AppColors.dangerBg; sIcon = Icons.cancel_outlined; }
 
     return Container(
       decoration: AppTheme.cardDecoration(context, accent: sColor),
@@ -928,16 +924,16 @@ class _InventoryScreenState extends State<InventoryScreen>
           AspectRatio(
             aspectRatio: 1.4,
             child: Container(
-              color: const Color(0xFFF8FAFC),
+              color: AppTheme.subtleFill(context),
               child: (e.imageUrl != null && e.imageUrl!.isNotEmpty)
                   ? Image.asset(
                       e.imageUrl!,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       errorBuilder: (context, error, stack) =>
-                          const Icon(Icons.fitness_center, size: 40, color: Colors.grey),
+                          const Icon(Icons.fitness_center, size: 40, color: AppColors.textMuted),
                     )
-                  : const Icon(Icons.fitness_center, size: 40, color: Colors.grey),
+                  : const Icon(Icons.fitness_center, size: 40, color: AppColors.textMuted),
             ),
           ),
           Padding(
@@ -952,7 +948,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Text(e.barcode, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
+                Text(e.barcode, style: TextStyle(color: AppTheme.textMuted(context), fontSize: 11)),
                 const SizedBox(height: 6),
                 Row(
                   children: [
@@ -976,13 +972,13 @@ class _InventoryScreenState extends State<InventoryScreen>
                 const SizedBox(height: 6),
                 Text(
                   'Qty: ${e.qty}${e.location != null && e.location!.isNotEmpty ? ' • ${e.location}' : ''}',
-                  style: TextStyle(fontSize: 11, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context)),
                 ),
                 if (e.description != null && e.description!.isNotEmpty) ...[
                   const SizedBox(height: 3),
                   Text(
                     e.description!,
-                    style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1001,8 +997,8 @@ class _InventoryScreenState extends State<InventoryScreen>
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () => _markEquipmentForMaintenance(e),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFF8E1), elevation: 0, visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(vertical: 8)),
-                        child: const Text('Maintain', style: TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.warningBg, elevation: 0, visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(vertical: 8)),
+                        child: const Text('Maintain', style: TextStyle(color: AppColors.warning, fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -1012,8 +1008,8 @@ class _InventoryScreenState extends State<InventoryScreen>
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => _removeEquipment(e),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFEBEE), elevation: 0, visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(vertical: 8)),
-                    child: const Text('Remove', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerBg, elevation: 0, visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(vertical: 8)),
+                    child: const Text('Remove', style: TextStyle(color: AppColors.danger, fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -1057,17 +1053,12 @@ class _InventoryScreenState extends State<InventoryScreen>
         ),
         const SizedBox(height: 12),
         if (_loadingMerch)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: CircularProgressIndicator()),
-          )
+          const LoadingState(padding: EdgeInsets.symmetric(vertical: 40))
         else if (_merchItems.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40),
-            child: Center(
-              child: Text('No merch items yet. Use "Add Item" to create one.', style: TextStyle(color: Colors.grey[600])),
-            ),
-          )
+          const EmptyState(
+            icon: Icons.checkroom_outlined,
+            padding: EdgeInsets.symmetric(vertical: 40),
+            message: 'No merch items yet. Use "Add Item" to create one.')
         else
           LayoutBuilder(builder: (context, constraints) {
             final crossAxisCount = constraints.maxWidth >= 900
@@ -1117,10 +1108,10 @@ class _InventoryScreenState extends State<InventoryScreen>
         localPath,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stack) =>
-            const Icon(Icons.checkroom_outlined, size: 48, color: Colors.grey),
+            const Icon(Icons.checkroom_outlined, size: 48, color: AppColors.textMuted),
       );
     }
-    return const Icon(Icons.checkroom_outlined, size: 48, color: Colors.grey);
+    return const Icon(Icons.checkroom_outlined, size: 48, color: AppColors.textMuted);
   }
 
   Widget _buildMerchCard(MerchItem p) {
@@ -1135,7 +1126,7 @@ class _InventoryScreenState extends State<InventoryScreen>
           AspectRatio(
             aspectRatio: 1.4,
             child: Container(
-              color: const Color(0xFFF8FAFC),
+              color: AppTheme.subtleFill(context),
               padding: const EdgeInsets.all(12),
               child: _buildMerchImage(p),
             ),
@@ -1152,20 +1143,20 @@ class _InventoryScreenState extends State<InventoryScreen>
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Text(p.sku, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
+                Text(p.sku, style: TextStyle(color: AppTheme.textMuted(context), fontSize: 11)),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       _formatCurrency(p.price.round()),
-                      style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 15),
+                      style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                     Text(
                       'Stock: ${p.stock}',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isLow ? Colors.red : Colors.grey[700],
+                        color: isLow ? AppColors.danger : AppTheme.textMuted(context),
                         fontWeight: isLow ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
@@ -1174,7 +1165,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                 const SizedBox(height: 4),
                 Text(
                   'Sold: ${p.sold}  •  Revenue: ${_formatCurrency(p.revenue.round())}',
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context)),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
@@ -1211,12 +1202,12 @@ class _InventoryScreenState extends State<InventoryScreen>
                       child: ElevatedButton(
                         onPressed: () => _removeProduct(p),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFEBEE),
+                          backgroundColor: AppColors.dangerBg,
                           elevation: 0,
                           visualDensity: VisualDensity.compact,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
-                        child: const Text('Remove', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
+                        child: const Text('Remove', style: TextStyle(color: AppColors.danger, fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -1288,7 +1279,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                   ),
                   Text(
                     _loadingMerchRevenueAnalytics ? '—' : _formatCurrency(totalForPeriod.round()),
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.orange),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.gold),
                   ),
                 ],
               ),
@@ -1296,11 +1287,11 @@ class _InventoryScreenState extends State<InventoryScreen>
               SizedBox(
                 height: 260,
                 child: _loadingMerchRevenueAnalytics
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const LoadingState()
                     : values.isEmpty
-                        ? Center(
-                            child: Text('No merch sales recorded for this period yet.',
-                                style: TextStyle(color: Colors.grey[600])))
+                        ? const EmptyState(
+                            icon: Icons.show_chart,
+                            message: 'No merch sales recorded for this period yet.')
                         : LineChart(
                             LineChartData(
                               maxY: maxY,
@@ -1320,7 +1311,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                                     interval: interval,
                                     reservedSize: 56,
                                     getTitlesWidget: (v, meta) => Text(_formatChartValue(v),
-                                        style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
                                   ),
                                 ),
                                 rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -1334,7 +1325,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 8.0),
                                         child: Text(labels[i],
-                                            style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                            style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
                                       );
                                     },
                                   ),

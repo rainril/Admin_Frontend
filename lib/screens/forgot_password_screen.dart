@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+﻿import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../theme/auth_theme.dart';
 import '../services/auth_service.dart';
@@ -205,7 +204,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 8),
               TextField(
                 controller: _emailController,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 decoration: authPillDecoration(hint: 'admin@primefit.com'),
               ),
             ],
@@ -217,7 +216,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               TextField(
                 controller: _codeController,
                 keyboardType: TextInputType.number,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 decoration: authPillDecoration(hint: 'Enter the code from your email'),
               ),
             ],
@@ -229,7 +228,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               TextField(
                 controller: _newPasswordController,
                 obscureText: _obscure,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 decoration: authPillDecoration(hint: 'Enter new password').copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility,
@@ -245,13 +244,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(_errorMessage!,
-                    style: AuthFonts.body(size: 13, color: Colors.red)),
+                    style: AuthFonts.body(size: 13, color: AppColors.danger)),
               ),
             if (_successMessage != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(_successMessage!,
-                    style: AuthFonts.body(size: 13, color: Colors.green)),
+                    style: AuthFonts.body(size: 13, color: AppColors.success)),
               ),
 
             SizedBox(
@@ -310,10 +309,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           });
                         }
                       },
-                style: TextButton.styleFrom(foregroundColor: const Color(0xFFB45309)),
+                style: TextButton.styleFrom(foregroundColor: authAmberLink),
                 child: Text(
                   _step == _Step.email ? '← Back to sign in' : 'Use a different email',
-                  style: AuthFonts.link(size: 13, color: const Color(0xFFB45309)),
+                  style: AuthFonts.link(size: 13, color: authAmberLink),
                 ),
               ),
             ),

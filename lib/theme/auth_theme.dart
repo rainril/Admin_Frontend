@@ -20,7 +20,7 @@ class AuthFonts {
         letterSpacing: -0.3,
       );
 
-  static TextStyle subtitle({double size = 14, Color color = const Color(0xFF6B7280)}) =>
+  static TextStyle subtitle({double size = 14, Color color = AppColors.textMuted}) =>
       GoogleFonts.inter(fontSize: size, color: color, height: 1.4, fontWeight: FontWeight.w400);
 
   static TextStyle label({double size = 13, Color color = Colors.black}) =>
@@ -34,10 +34,55 @@ class AuthFonts {
 
   static TextStyle button({double size = 15, Color color = Colors.white}) =>
       GoogleFonts.inter(fontSize: size, fontWeight: FontWeight.w800, color: color, letterSpacing: 0.6);
+
+  /// Shared text style for the auth screens' text-field input value itself
+  /// (as opposed to its label/hint) — always black, since these screens
+  /// force a light field background regardless of app theme.
+  static TextStyle input({double size = 14}) =>
+      GoogleFonts.inter(fontSize: size, color: Colors.black);
 }
 
 /// Panel backdrop color sampled from the login background photo's darkest corners.
 const Color authPanelBackdrop = Color(0xFF121212);
+
+/// Shared amber link/accent color for the auth screens (Login, Forgot
+/// Password, Register) — used for "Forgot password?", "Sign up", "Back to
+/// Login" style links and their matching TextButton foreground.
+const Color authAmberLink = Color(0xFFB45309);
+
+/// The one floating result SnackBar shared by Login, Register, and Forgot
+/// Password — a dark pill with a gold status icon and white message text.
+void showAuthSnack(
+  BuildContext context, {
+  required String message,
+  bool isError = false,
+}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: AppColors.dark,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.all(16),
+      duration: const Duration(seconds: 3),
+      content: Row(
+        children: [
+          Icon(
+            isError ? Icons.error_outline : Icons.check_circle_outline,
+            color: AppColors.gold,
+            size: 22,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
 /// Rounded, filled "pill" style input decoration matching the auth screens'
 /// soft light-gray text fields with no visible border until focused.

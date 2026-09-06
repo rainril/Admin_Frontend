@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../theme/app_theme.dart';
 
 /// Standalone QR scanner screen — its own route/page (`/scan`), meant to be
 /// opened in its own browser tab so it can sit on a second monitor while
@@ -121,7 +122,7 @@ class _QrScannerPageState extends State<QrScannerPage> {
           IgnorePointer(
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF14B8C6), width: 3),
+                border: Border.all(color: AppColors.cyan, width: 3),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),

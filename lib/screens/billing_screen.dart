@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/tab_visibility.dart';
 import '../services/payment_data.dart';
@@ -6,65 +6,6 @@ import '../services/payment_service.dart';
 import '../services/attendance_service.dart';
 import '../services/earnings_pdf_service.dart';
 import '../services/current_user.dart';
-
-/// This screen was built with its own self-contained slate palette instead
-/// of the shared AppColors/AppTheme. Rather than rewiring every literal to
-/// the app-wide tokens, it gets a light/dark pair of its own so the same
-/// visual design survives dark mode instead of staying hardcoded white.
-class _BillingColors {
-  final Color scaffoldBg;
-  final Color card;
-  final Color border;
-  final Color heading;
-  final Color label;
-  final Color secondary;
-  final Color muted;
-  final Color placeholder;
-  final Color subtleBg;
-  final Color tableDivider;
-
-  const _BillingColors({
-    required this.scaffoldBg,
-    required this.card,
-    required this.border,
-    required this.heading,
-    required this.label,
-    required this.secondary,
-    required this.muted,
-    required this.placeholder,
-    required this.subtleBg,
-    required this.tableDivider,
-  });
-
-  static const light = _BillingColors(
-    scaffoldBg: Color(0xFFF8F9FA),
-    card: Colors.white,
-    border: Color(0xFFE2E8F0),
-    heading: Color(0xFF1E293B),
-    label: Color(0xFF334155),
-    secondary: Color(0xFF475569),
-    muted: Color(0xFF64748B),
-    placeholder: Color(0xFF94A3B8),
-    subtleBg: Color(0xFFF8FAFC),
-    tableDivider: Color(0xFFF1F5F9),
-  );
-
-  static const dark = _BillingColors(
-    scaffoldBg: Color(0xFF121417),
-    card: Color(0xFF1E2126),
-    border: Color(0xFF2C3038),
-    heading: Color(0xFFE9EAEE),
-    label: Color(0xFFD1D5DB),
-    secondary: Color(0xFFB0B6C0),
-    muted: Color(0xFF9CA3AF),
-    placeholder: Color(0xFF7B8290),
-    subtleBg: Color(0xFF23262D),
-    tableDivider: Color(0xFF2C3038),
-  );
-
-  static _BillingColors of(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? dark : light;
-}
 
 class BillingScreen extends StatefulWidget {
   const BillingScreen({super.key});
@@ -364,9 +305,8 @@ class _BillingScreenState extends State<BillingScreen>
 
   @override
   Widget build(BuildContext context) {
-    final c = _BillingColors.of(context);
     return Scaffold(
-      backgroundColor: c.scaffoldBg,
+      backgroundColor: AppTheme.pageBackground(context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(32.0),
         child: Column(
@@ -437,7 +377,7 @@ class _BillingScreenState extends State<BillingScreen>
 
             Text(
               'Membership Plans',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: c.heading),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context)),
             ),
             const SizedBox(height: 12),
             _buildMembershipPlanCards(),
@@ -448,7 +388,7 @@ class _BillingScreenState extends State<BillingScreen>
               children: [
                 Text(
                   'Membership Plan Payments',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: c.heading),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context)),
                 ),
               ],
             ),
@@ -473,21 +413,21 @@ class _BillingScreenState extends State<BillingScreen>
               clipBehavior: Clip.antiAlias,
               decoration: AppTheme.cardDecoration(context, accent: AppColors.cyan),
               child: Theme(
-                data: Theme.of(context).copyWith(dividerColor: c.tableDivider),
+                data: Theme.of(context).copyWith(dividerColor: AppTheme.border(context)),
                 child: DataTable(
-                  headingRowColor: WidgetStateProperty.all(c.subtleBg),
+                  headingRowColor: WidgetStateProperty.all(AppTheme.subtleFill(context)),
                   columns: [
-                    DataColumn(label: Text('MEMBER', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('PLAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('AMOUNT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('METHOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('DATE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('STATUS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
+                    DataColumn(label: Text('MEMBER', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('PLAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('AMOUNT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('METHOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('DATE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('STATUS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
                   ],
                   rows: _loadingPayments
                       ? [
                           DataRow(cells: [
-                            DataCell(Text('Loading...', style: TextStyle(color: c.placeholder))),
+                            DataCell(Text('Loading...', style: TextStyle(color: AppTheme.textMuted(context)))),
                             const DataCell(Text('')),
                             const DataCell(Text('')),
                             const DataCell(Text('')),
@@ -498,7 +438,7 @@ class _BillingScreenState extends State<BillingScreen>
                       : PaymentData.instance.payments.isEmpty
                           ? [
                               DataRow(cells: [
-                                DataCell(Text('No membership payments yet', style: TextStyle(color: c.placeholder))),
+                                DataCell(Text('No membership payments yet', style: TextStyle(color: AppTheme.textMuted(context)))),
                                 const DataCell(Text('')),
                                 const DataCell(Text('')),
                                 const DataCell(Text('')),
@@ -529,12 +469,12 @@ class _BillingScreenState extends State<BillingScreen>
 
             Text(
               'Walk-in Payments',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: c.heading),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context)),
             ),
             const SizedBox(height: 4),
             Text(
               'Payments from walk-in customers checked in via the Attendance page.',
-              style: TextStyle(fontSize: 13, color: c.muted),
+              style: TextStyle(fontSize: 13, color: AppTheme.textMuted(context)),
             ),
             const SizedBox(height: 12),
             Container(
@@ -542,20 +482,20 @@ class _BillingScreenState extends State<BillingScreen>
               clipBehavior: Clip.antiAlias,
               decoration: AppTheme.cardDecoration(context, accent: AppColors.cyan),
               child: Theme(
-                data: Theme.of(context).copyWith(dividerColor: c.tableDivider),
+                data: Theme.of(context).copyWith(dividerColor: AppTheme.border(context)),
                 child: DataTable(
-                  headingRowColor: WidgetStateProperty.all(c.subtleBg),
+                  headingRowColor: WidgetStateProperty.all(AppTheme.subtleFill(context)),
                   columns: [
-                    DataColumn(label: Text('NAME', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('AMOUNT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('METHOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('DATE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
-                    DataColumn(label: Text('STATUS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c.muted))),
+                    DataColumn(label: Text('NAME', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('AMOUNT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('METHOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('DATE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
+                    DataColumn(label: Text('STATUS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted(context)))),
                   ],
                   rows: _loadingWalkIns
                       ? [
                           DataRow(cells: [
-                            DataCell(Text('Loading...', style: TextStyle(color: c.placeholder))),
+                            DataCell(Text('Loading...', style: TextStyle(color: AppTheme.textMuted(context)))),
                             const DataCell(Text('')),
                             const DataCell(Text('')),
                             const DataCell(Text('')),
@@ -565,7 +505,7 @@ class _BillingScreenState extends State<BillingScreen>
                       : _walkIns.isEmpty
                           ? [
                               DataRow(cells: [
-                                DataCell(Text('No walk-in payments yet', style: TextStyle(color: c.placeholder))),
+                                DataCell(Text('No walk-in payments yet', style: TextStyle(color: AppTheme.textMuted(context)))),
                                 const DataCell(Text('')),
                                 const DataCell(Text('')),
                                 const DataCell(Text('')),
@@ -581,10 +521,10 @@ class _BillingScreenState extends State<BillingScreen>
                               return DataRow(
                                 color: zebra == null ? null : WidgetStateProperty.all(zebra),
                                 cells: [
-                                DataCell(Text(w['name'] ?? '', style: TextStyle(fontWeight: FontWeight.w600, color: c.heading))),
-                                DataCell(Text('₱${((w['amount'] ?? 0) as num).toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.w600, color: c.heading))),
-                                DataCell(Text(w['method'] ?? '', style: TextStyle(color: c.secondary))),
-                                DataCell(Text(w['date'] ?? '', style: TextStyle(color: c.secondary))),
+                                DataCell(Text(w['name'] ?? '', style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.heading(context)))),
+                                DataCell(Text('₱${((w['amount'] ?? 0) as num).toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.heading(context)))),
+                                DataCell(Text(w['method'] ?? '', style: TextStyle(color: AppTheme.textMuted(context)))),
+                                DataCell(Text(w['date'] ?? '', style: TextStyle(color: AppTheme.textMuted(context)))),
                                 DataCell(Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(color: colors[0], borderRadius: BorderRadius.circular(12)),
@@ -609,7 +549,6 @@ class _BillingScreenState extends State<BillingScreen>
     required Color iconColor,
     Color? accent,
   }) {
-    final c = _BillingColors.of(context);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -630,12 +569,12 @@ class _BillingScreenState extends State<BillingScreen>
               children: [
                 Text(
                   title,
-                  style: TextStyle(color: c.muted, fontSize: 13, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: AppTheme.textMuted(context), fontSize: 13, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: c.heading),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.heading(context)),
                 ),
               ],
             ),
@@ -670,7 +609,6 @@ class _BillingScreenState extends State<BillingScreen>
   }
 
   Widget _buildPlanCard(String name, String price, String sub, Color chipBg, Color chipText) {
-    final c = _BillingColors.of(context);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -686,11 +624,11 @@ class _BillingScreenState extends State<BillingScreen>
                   decoration: BoxDecoration(color: chipBg, borderRadius: BorderRadius.circular(12)),
                   child: Text(name, style: TextStyle(color: chipText, fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
-                Text(price, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: c.heading)),
+                Text(price, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.heading(context))),
               ],
             ),
             const SizedBox(height: 16),
-            Text(sub, style: TextStyle(color: c.muted, fontSize: 13)),
+            Text(sub, style: TextStyle(color: AppTheme.textMuted(context), fontSize: 13)),
           ],
         ),
       ),
@@ -698,20 +636,19 @@ class _BillingScreenState extends State<BillingScreen>
   }
 
   DataRow _buildPaymentRow(String member, String plan, String amount, String method, String date, String status, Color statusBg, Color statusText, [int index = 0]) {
-    final c = _BillingColors.of(context);
     final zebra = AppTheme.zebraRow(context, index);
     return DataRow(
       color: zebra == null ? null : WidgetStateProperty.all(zebra),
       cells: [
-      DataCell(Text(member, style: TextStyle(fontWeight: FontWeight.w600, color: c.heading))),
+      DataCell(Text(member, style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.heading(context)))),
       DataCell(Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(color: c.subtleBg, borderRadius: BorderRadius.circular(6)),
-        child: Text(plan, style: TextStyle(fontSize: 12, color: c.label)),
+        decoration: BoxDecoration(color: AppTheme.subtleFill(context), borderRadius: BorderRadius.circular(6)),
+        child: Text(plan, style: TextStyle(fontSize: 12, color: AppTheme.heading(context))),
       )),
-      DataCell(Text(amount, style: TextStyle(fontWeight: FontWeight.w600, color: c.heading))),
-      DataCell(Text(method, style: TextStyle(color: c.secondary))),
-      DataCell(Text(date, style: TextStyle(color: c.secondary))),
+      DataCell(Text(amount, style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.heading(context)))),
+      DataCell(Text(method, style: TextStyle(color: AppTheme.textMuted(context)))),
+      DataCell(Text(date, style: TextStyle(color: AppTheme.textMuted(context)))),
       DataCell(Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(12)),

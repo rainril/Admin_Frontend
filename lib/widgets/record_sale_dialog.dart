@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/merch_sale_service.dart';
 import '../theme/app_theme.dart';
 
@@ -30,8 +30,8 @@ Future<bool> showRecordSaleDialog(
   String? errorText;
 
   const methods = ['Cash', 'GCash', 'Maya', 'Bank Transfer'];
-  const accent = Color(0xFF14B8C6);
-  const mutedText = Color(0xFF8A8F98);
+  const accent = AppColors.cyan;
+  const mutedText = AppColors.textMuted;
 
   final result = await showDialog<bool>(
     context: context,
@@ -71,7 +71,7 @@ Future<bool> showRecordSaleDialog(
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: outOfStock ? Colors.red : mutedText,
+                      color: outOfStock ? AppColors.danger : mutedText,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -154,7 +154,7 @@ Future<bool> showRecordSaleDialog(
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
+                      color: AppTheme.subtleFill(context),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Theme.of(context).dividerColor),
                     ),
@@ -170,7 +170,7 @@ Future<bool> showRecordSaleDialog(
 
                   if (errorText != null) ...[
                     const SizedBox(height: 12),
-                    Text(errorText!, style: const TextStyle(color: Colors.red, fontSize: 12)),
+                    Text(errorText!, style: const TextStyle(color: AppColors.danger, fontSize: 12)),
                   ],
 
                   const SizedBox(height: 20),

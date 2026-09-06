@@ -415,7 +415,7 @@ class _ReceiptCard extends StatelessWidget {
                     label: const Text('Approve',
                         style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00B4D8),
+                      backgroundColor: AppColors.cyan,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),

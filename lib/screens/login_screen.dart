@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+﻿import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../theme/auth_theme.dart';
 import 'app_shell.dart';
@@ -54,27 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (_) => const AppShell()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.dark,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline, color: AppColors.gold, size: 22),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  result['message'] ?? 'Login failed',
-                  style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      showAuthSnack(context, message: result['message'] ?? 'Login failed', isError: true);
     }
   }
 
@@ -157,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _emailController,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Email is required';
                   if (!v.contains('@')) return 'Enter a valid email';
@@ -177,11 +156,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
                     },
                     style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFB45309),
+                        foregroundColor: authAmberLink,
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 0)),
                     child: Text('Forgot password?',
-                        style: AuthFonts.link(size: 13, color: const Color(0xFFB45309))),
+                        style: AuthFonts.link(size: 13, color: authAmberLink)),
                   ),
                 ],
               ),
@@ -189,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Password is required';
                   return null;
@@ -235,11 +214,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Text.rich(
                     TextSpan(
                       text: "Don't have an account? ",
-                      style: AuthFonts.body(size: 13.5, color: const Color(0xFF6B7280)),
+                      style: AuthFonts.body(size: 13.5, color: AppColors.textMuted),
                       children: [
                         TextSpan(
                           text: 'Sign Up',
-                          style: AuthFonts.link(size: 13.5, color: const Color(0xFFB45309), weight: FontWeight.w600),
+                          style: AuthFonts.link(size: 13.5, color: authAmberLink, weight: FontWeight.w600),
                         ),
                       ],
                     ),

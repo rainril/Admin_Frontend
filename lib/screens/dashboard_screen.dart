@@ -7,6 +7,7 @@ import '../services/current_user.dart';
 import '../services/payment_data.dart';
 import '../services/attendance_data.dart';
 import '../widgets/ai_insight_card.dart';
+import '../widgets/state_views.dart';
 import '../services/dashboard_stats_service.dart';
 import '../services/dashboard_analytics_service.dart';
 
@@ -506,11 +507,11 @@ class _DashboardScreenState extends State<DashboardScreen>
           const SizedBox(height: 16),
           Expanded(
             child: _loadingRevenue
-                ? const Center(child: CircularProgressIndicator())
+                ? const LoadingState()
                 : values.isEmpty
-                    ? const Center(
-                        child: Text('No revenue recorded for this period yet.',
-                            style: TextStyle(color: AppColors.textMuted)))
+                    ? const EmptyState(
+                        icon: Icons.show_chart,
+                        message: 'No revenue recorded for this period yet.')
                     : LineChart(
                         LineChartData(
                           maxY: maxY,
@@ -670,11 +671,11 @@ class _DashboardScreenState extends State<DashboardScreen>
       trailing: _aiBadge(label: 'Live'),
       accent: AppColors.cyan,
       child: _loadingAttendance
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingState()
           : values.isEmpty
-              ? const Center(
-                  child: Text('No attendance recorded yet this week.',
-                      style: TextStyle(color: AppColors.textMuted)))
+              ? const EmptyState(
+                  icon: Icons.bar_chart,
+                  message: 'No attendance recorded yet this week.')
               : BarChart(
                   BarChartData(
                     maxY: maxY,
@@ -768,18 +769,11 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 16),
           if (_loadingExpiring)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: CircularProgressIndicator()),
-            )
+            const LoadingState()
           else if (_expiringMembers.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(
-                child: Text('No memberships expiring in the next 7 days.',
-                    style: TextStyle(color: AppColors.textMuted)),
-              ),
-            )
+            const EmptyState(
+              icon: Icons.card_membership_outlined,
+              message: 'No memberships expiring in the next 7 days.')
           else
             for (final m in _expiringMembers) _expiringMemberRow(m),
         ],
@@ -864,18 +858,11 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 16),
           if (_loadingChurnRisk)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: CircularProgressIndicator()),
-            )
+            const LoadingState()
           else if (_churnRisk.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(
-                child: Text('No members currently flagged as churn risks.',
-                    style: TextStyle(color: AppColors.textMuted)),
-              ),
-            )
+            const EmptyState(
+              icon: Icons.shield_outlined,
+              message: 'No members currently flagged as churn risks.')
           else
             for (final m in _churnRisk.take(8)) _churnRiskRow(m),
         ],
@@ -936,10 +923,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 16),
           if (_loadingChurnForecast)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: CircularProgressIndicator()),
-            )
+            const LoadingState()
           else if (_churnForecast == null)
             const Text('Forecast unavailable right now.',
                 style: TextStyle(color: AppColors.textMuted))
@@ -997,11 +981,11 @@ class _DashboardScreenState extends State<DashboardScreen>
       title: 'Weekly Attendance',
       accent: AppColors.cyan,
       child: _loadingAttendance
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingState()
           : values.isEmpty
-              ? const Center(
-                  child: Text('No attendance recorded yet this week.',
-                      style: TextStyle(color: AppColors.textMuted)))
+              ? const EmptyState(
+                  icon: Icons.bar_chart,
+                  message: 'No attendance recorded yet this week.')
               : BarChart(
                   BarChartData(
                     maxY: maxY,
@@ -1095,16 +1079,12 @@ class _DashboardScreenState extends State<DashboardScreen>
           Text(title, style: AppTheme.sectionTitle(context)),
           const SizedBox(height: 16),
           if (loading)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: CircularProgressIndicator()),
-            )
+            const LoadingState(padding: EdgeInsets.symmetric(vertical: 20))
           else if (entries.isEmpty)
-            const Padding(
+            const EmptyState(
+              icon: Icons.event_busy_outlined,
               padding: EdgeInsets.symmetric(vertical: 12),
-              child: Text('No entries yet today.',
-                  style: TextStyle(color: AppColors.textMuted)),
-            )
+              message: 'No entries yet today.')
           else
             for (final e in entries)
               Padding(
@@ -1150,15 +1130,12 @@ class _DashboardScreenState extends State<DashboardScreen>
           Text('Recent Notifications', style: AppTheme.sectionTitle(context)),
           const SizedBox(height: 14),
           if (_loadingNotifications)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Center(child: CircularProgressIndicator()),
-            )
+            const LoadingState(padding: EdgeInsets.symmetric(vertical: 16))
           else if (_notifications.isEmpty)
-            const Padding(
+            const EmptyState(
+              icon: Icons.notifications_none,
               padding: EdgeInsets.symmetric(vertical: 16),
-              child: Text('No recent activity yet.', style: TextStyle(color: AppColors.textMuted)),
-            )
+              message: 'No recent activity yet.')
           else
             for (final n in _notifications) _notificationRow(n),
         ],

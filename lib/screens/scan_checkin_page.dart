@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/attendance_service.dart';
 import '../theme/app_theme.dart';
@@ -16,14 +16,14 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
   static const double scanBoxSize = 340;
 
   // PrimeFit brand palette.
-  static const Color gold = Color(0xFFF4CD4A); // primary
-  static const Color cyan = Color(0xFF12F5F4); // scanner frame
-  static const Color mutedText = Color(0xFFAEB6BB); // fallback for status pills
+  static const Color gold = AppColors.gold;
+  static const Color cyan = AppColors.cyan; // scanner frame
+  static const Color mutedText = AppColors.textMuted; // fallback for status pills
 
   static const Map<String, List<Color>> _subscriptionColors = {
-    'active': [Color(0xFFE6F7ED), Color(0xFF16A34A)],
-    'expiring_soon': [Color(0xFFFEF3E2), Color(0xFFCA8A04)],
-    'expired': [Color(0xFFFDEBEC), Color(0xFFDC2626)],
+    'active': [AppColors.successBg, AppColors.success],
+    'expiring_soon': [AppColors.warningBg, AppColors.warning],
+    'expired': [AppColors.dangerBg, AppColors.danger],
   };
 
   final MobileScannerController _controller = MobileScannerController();
@@ -67,7 +67,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
     _messengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red.shade600 : null,
+        backgroundColor: isError ? AppColors.danger : null,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -104,7 +104,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text(email, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                  Text(email, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
                 ],
               ),
             ),
@@ -146,7 +146,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: isExpired ? Colors.red.shade600 : gold,
+              backgroundColor: isExpired ? AppColors.danger : gold,
             ),
             onPressed: () async {
               Navigator.pop(dialogContext);
@@ -184,7 +184,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 100, child: Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13))),
+          SizedBox(width: 100, child: Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 13))),
           Expanded(child: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500))),
         ],
       ),

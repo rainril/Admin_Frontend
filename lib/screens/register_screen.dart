@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+﻿import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../theme/auth_theme.dart';
 import '../services/auth_service.dart';
@@ -67,31 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.dark,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 3),
-        content: Row(
-          children: [
-            Icon(
-              isError ? Icons.error_outline : Icons.check_circle_outline,
-              color: AppColors.gold,
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    showAuthSnack(context, message: message, isError: isError);
   }
 
   @override
@@ -207,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               DropdownButtonFormField<String>(
                 initialValue: _adminLevel,
                 decoration: authPillDecoration(hint: ''),
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 items: const [
                   DropdownMenuItem(value: 'staff', child: Text('Staff')),
                   DropdownMenuItem(value: 'owner', child: Text('Owner')),
@@ -223,7 +198,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Password is required';
                   if (v.length < 6) return 'Minimum 6 characters';
@@ -244,7 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextFormField(
                 controller: _confirmPasswordController,
                 obscureText: _obscureConfirm,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+                style: AuthFonts.input(),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Please confirm your password';
                   return null;
@@ -291,11 +266,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Text.rich(
                     TextSpan(
                       text: 'Already have an account? ',
-                      style: AuthFonts.body(size: 13.5, color: const Color(0xFF6B7280)),
+                      style: AuthFonts.body(size: 13.5, color: AppColors.textMuted),
                       children: [
                         TextSpan(
                           text: 'Sign In',
-                          style: AuthFonts.link(size: 13.5, color: const Color(0xFFB45309), weight: FontWeight.w600),
+                          style: AuthFonts.link(size: 13.5, color: authAmberLink, weight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -321,7 +296,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
+          style: AuthFonts.input(),
           validator: validator,
           decoration: authPillDecoration(hint: ''),
         ),

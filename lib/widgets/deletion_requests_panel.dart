@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/deletion_request_service.dart';
 import '../theme/app_theme.dart';
 
@@ -19,7 +19,7 @@ class DeletionRequestsPanel extends StatefulWidget {
 }
 
 class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
-  static const Color mutedText = Color(0xFF8A8F98);
+  static const Color mutedText = AppColors.textMuted;
 
   List<DeletionRequestItem> _pending = [];
   bool _loading = true;
@@ -48,7 +48,7 @@ class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
     setState(() => _actingOn.remove(req.id));
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result.message), backgroundColor: result.success ? null : Colors.red.shade600),
+      SnackBar(content: Text(result.message), backgroundColor: result.success ? null : AppColors.danger),
     );
 
     if (result.success) refresh();
@@ -61,7 +61,7 @@ class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
     setState(() => _actingOn.remove(req.id));
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result.message), backgroundColor: result.success ? null : Colors.red.shade600),
+      SnackBar(content: Text(result.message), backgroundColor: result.success ? null : AppColors.danger),
     );
 
     if (result.success) refresh();
@@ -95,11 +95,11 @@ class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded, size: 18, color: Colors.red),
+                    const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.danger),
                     const SizedBox(width: 8),
                     Text(
                       'Removal Requests Awaiting Your Approval (${_pending.length})',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.danger),
                     ),
                   ],
                 ),
@@ -166,7 +166,7 @@ class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
                 ElevatedButton(
                   onPressed: () => _approve(req),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppColors.danger,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
