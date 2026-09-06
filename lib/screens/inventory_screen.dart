@@ -573,7 +573,7 @@ class _InventoryScreenState extends State<InventoryScreen>
         children: [
           const PageHeaderBanner(
             eyebrow: 'Inventory',
-            emoji: '🏋️',
+            icon: Icons.inventory_2_outlined,
             title: 'Inventory Management',
             subtitle: 'Equipment, products, and revenue tracking',
           ),

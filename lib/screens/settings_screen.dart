@@ -300,7 +300,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _header() {
     return const PageHeaderBanner(
       eyebrow: 'Settings',
-      emoji: '⚙️',
+      icon: Icons.settings_outlined,
       title: 'Settings',
       subtitle: 'Manage system configuration and preferences',
     );

@@ -315,7 +315,7 @@ class _BillingScreenState extends State<BillingScreen>
           children: [
             const PageHeaderBanner(
               eyebrow: 'Payments',
-              emoji: '💳',
+              icon: Icons.credit_card_outlined,
               title: 'Billing & Payments',
               subtitle: 'Manage membership plans and track payments',
             ),

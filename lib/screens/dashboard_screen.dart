@@ -240,7 +240,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           children: [
             const PageHeaderBanner(
               eyebrow: 'Dashboard',
-              emoji: '👋',
+              icon: Icons.grid_view_rounded,
               title: 'Welcome back!',
               subtitle: "Here's what's happening with your gym today.",
             ),

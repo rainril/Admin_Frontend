@@ -143,7 +143,7 @@ class _AttendancePageState extends State<AttendancePage>
       children: [
         const PageHeaderBanner(
           eyebrow: 'Attendance',
-          emoji: '✅',
+          icon: Icons.qr_code_scanner_rounded,
           title: 'Attendance',
           subtitle: 'Check in walk-in customers and record their payment.',
         ),

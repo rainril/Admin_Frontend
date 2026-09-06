@@ -99,11 +99,11 @@ class Sidebar extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    RichText(
-                      text: TextSpan(
+                    Text.rich(
+                      TextSpan(
                         style: GoogleFonts.archivoBlack(fontSize: 17, letterSpacing: -0.3),
                         children: const [
-                          TextSpan(text: 'Prime', style: TextStyle(color: Colors.white)),
+                          TextSpan(text: 'Prime', style: TextStyle(color: AppColors.dark)),
                           TextSpan(text: 'Fit', style: TextStyle(color: AppColors.gold)),
                         ],
                       ),
@@ -284,10 +284,10 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
         : (_hovered ? Colors.white.withValues(alpha: 0.12) : Colors.transparent);
     final Color textColor = active
         ? AppColors.inventoryHeader
-        : Colors.white.withValues(alpha: 0.82);
+        : Colors.white.withValues(alpha: 0.95);
     final Color iconColor = active
         ? AppColors.cyan
-        : Colors.white.withValues(alpha: 0.75);
+        : Colors.white.withValues(alpha: 0.92);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),

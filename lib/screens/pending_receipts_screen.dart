@@ -140,7 +140,7 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
           children: [
             PageHeaderBanner(
               eyebrow: 'Receipts',
-              emoji: '🧾',
+              icon: Icons.receipt_long_outlined,
               title: 'Pending Payment Receipts',
               subtitle:
                   'Review manually-uploaded GCash / Maya payment receipts and approve or reject them.',

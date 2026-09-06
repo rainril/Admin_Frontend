@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 /// Shared solid-cyan "hero" banner used at the top of every admin screen —
-/// an eyebrow label, a bold white heading (with a small leading emoji), and
-/// a muted-white subtext line. Solid [AppColors.cyan] fill, no gradient,
-/// matching the sidebar so both read as one brand surface.
+/// an eyebrow label, a leading icon + bold white heading, and a muted-white
+/// subtext line. Solid [AppColors.cyan] fill, no gradient, matching the
+/// sidebar so both read as one brand surface.
 class PageHeaderBanner extends StatelessWidget {
   final String eyebrow;
-  final String emoji;
+  final IconData icon;
   final String title;
   final String subtitle;
   final Widget? trailing;
@@ -15,7 +15,7 @@ class PageHeaderBanner extends StatelessWidget {
   const PageHeaderBanner({
     super.key,
     required this.eyebrow,
-    required this.emoji,
+    required this.icon,
     required this.title,
     required this.subtitle,
     this.trailing,
@@ -48,14 +48,23 @@ class PageHeaderBanner extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  '$title $emoji',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.4,
-                    color: Colors.white,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(icon, size: 26, color: Colors.white),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.4,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 6),
                 Text(
