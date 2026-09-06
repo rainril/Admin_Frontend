@@ -92,7 +92,10 @@ class _AppShellState extends State<AppShell> {
     return FloatingChatbotOverlay(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_titles[_index]),
+          backgroundColor: AppColors.cyan,
+          foregroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: Text(_titles[_index], style: const TextStyle(color: Colors.white)),
         ),
         drawer: Drawer(
           child: Sidebar(

@@ -3,6 +3,7 @@ import '../theme/app_theme.dart';
 import '../services/current_user.dart';
 import '../services/settings_service.dart';
 import '../services/theme_controller.dart';
+import '../widgets/page_header_banner.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -301,15 +302,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _header() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text('Settings', style: AppTheme.pageTitle(context)),
-        const SizedBox(height: 6),
-        Text('Manage system configuration and preferences',
-            style: AppTheme.pageSubtitle(context)),
-      ],
+    return const PageHeaderBanner(
+      eyebrow: 'Settings',
+      emoji: '⚙️',
+      title: 'Settings',
+      subtitle: 'Manage system configuration and preferences',
     );
   }
 

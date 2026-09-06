@@ -8,6 +8,7 @@ import '../services/payment_data.dart';
 import '../services/attendance_data.dart';
 import '../widgets/ai_insight_card.dart';
 import '../widgets/state_views.dart';
+import '../widgets/page_header_banner.dart';
 import '../services/dashboard_stats_service.dart';
 import '../services/dashboard_analytics_service.dart';
 
@@ -237,10 +238,12 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Dashboard', style: AppTheme.pageTitle(context)),
-            const SizedBox(height: 6),
-            Text("Welcome back! Here's what's happening with your gym today.",
-                style: AppTheme.pageSubtitle(context)),
+            const PageHeaderBanner(
+              eyebrow: 'Dashboard',
+              emoji: '👋',
+              title: 'Welcome back!',
+              subtitle: "Here's what's happening with your gym today.",
+            ),
             const SizedBox(height: AppSpacing.section),
             GridView.count(
               crossAxisCount: statCols,

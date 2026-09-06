@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/pending_receipt_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/tab_visibility.dart';
+import '../widgets/page_header_banner.dart';
 
 /// Review queue for manually-uploaded GCash / Maya payment receipts. An admin
 /// eyeballs the receipt image against the OCR-extracted amount / reference and
@@ -137,29 +138,17 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Pending Payment Receipts',
-                          style: AppTheme.pageTitle(context)),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Review manually-uploaded GCash / Maya payment receipts and approve or reject them.',
-                        style: AppTheme.pageSubtitle(context),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: _loading ? null : () => _load(),
-                  icon: const Icon(Icons.refresh),
-                  tooltip: 'Refresh',
-                ),
-              ],
+            PageHeaderBanner(
+              eyebrow: 'Receipts',
+              emoji: '🧾',
+              title: 'Pending Payment Receipts',
+              subtitle:
+                  'Review manually-uploaded GCash / Maya payment receipts and approve or reject them.',
+              trailing: IconButton(
+                onPressed: _loading ? null : () => _load(),
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                tooltip: 'Refresh',
+              ),
             ),
             const SizedBox(height: AppSpacing.section),
             _body(),

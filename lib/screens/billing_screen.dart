@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/tab_visibility.dart';
+import '../widgets/page_header_banner.dart';
 import '../services/payment_data.dart';
 import '../services/payment_service.dart';
 import '../services/attendance_service.dart';
@@ -312,20 +313,11 @@ class _BillingScreenState extends State<BillingScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Billing & Payments', style: AppTheme.pageTitle(context)),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Manage membership plans and track payments',
-                      style: AppTheme.pageSubtitle(context),
-                    ),
-                  ],
-                ),
-              ],
+            const PageHeaderBanner(
+              eyebrow: 'Payments',
+              emoji: '💳',
+              title: 'Billing & Payments',
+              subtitle: 'Manage membership plans and track payments',
             ),
             const SizedBox(height: AppSpacing.section),
 

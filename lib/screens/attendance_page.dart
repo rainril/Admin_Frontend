@@ -3,6 +3,7 @@ import '../services/attendance_service.dart';
 import '../services/current_user.dart';
 import '../theme/app_theme.dart';
 import '../widgets/tab_visibility.dart';
+import '../widgets/page_header_banner.dart';
 
 /// Attendance page — dalawang hiwalay na listahan:
 ///  - Walk-in Customers: mga hindi naka-membership plan, manual check-in
@@ -140,11 +141,11 @@ class _AttendancePageState extends State<AttendancePage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Attendance', style: AppTheme.pageTitle(context)),
-        const SizedBox(height: 6),
-        Text(
-          'Check in walk-in customers and record their payment.',
-          style: AppTheme.pageSubtitle(context),
+        const PageHeaderBanner(
+          eyebrow: 'Attendance',
+          emoji: '✅',
+          title: 'Attendance',
+          subtitle: 'Check in walk-in customers and record their payment.',
         ),
         const SizedBox(height: 20),
         Wrap(

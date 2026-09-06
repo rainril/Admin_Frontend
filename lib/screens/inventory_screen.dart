@@ -12,6 +12,7 @@ import '../widgets/pending_merch_sales_widget.dart';
 import '../widgets/deletion_requests_panel.dart';
 import '../widgets/tab_visibility.dart';
 import '../widgets/state_views.dart';
+import '../widgets/page_header_banner.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -570,13 +571,11 @@ class _InventoryScreenState extends State<InventoryScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Inventory Management', style: AppTheme.pageTitle(context)),
-              const SizedBox(height: 6),
-              Text('Equipment, products, and revenue tracking', style: AppTheme.pageSubtitle(context)),
-            ],
+          const PageHeaderBanner(
+            eyebrow: 'Inventory',
+            emoji: '🏋️',
+            title: 'Inventory Management',
+            subtitle: 'Equipment, products, and revenue tracking',
           ),
           const SizedBox(height: AppSpacing.section),
           if (CurrentUser.isOwner) const DeletionRequestsPanel(),
