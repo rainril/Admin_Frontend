@@ -92,12 +92,14 @@ class PendingReceipt {
       ]),
       paymentMethod: pick(['payment_method', 'method', 'channel']),
       ocrAmount: pick([
+        'ocr_extracted_amount',
         'ocr_amount',
         'extracted_amount',
         'amount_extracted',
         'detected_amount',
       ]),
       ocrReference: pick([
+        'ocr_extracted_reference',
         'ocr_reference',
         'ocr_reference_number',
         'reference_number',
