@@ -6,6 +6,10 @@ class AppColors {
   static const cyan = Color(0xFF17C3D6);
   static const cyanDark = Color(0xFF0E8FA0);
   static const gold = Color(0xFFF2B705);
+
+  /// Deeper gold for the hover/pressed overlay on gold buttons — see
+  /// [AppTheme.goldButtonStyle].
+  static const goldDark = Color(0xFFC99400);
   static const dark = Color(0xFF0B0B0D);
   static const bg = Color(0xFFF7F8FA); // soft off-white main content ground
   static const cardBorder = Color(0xFFE7E9EE);
@@ -241,6 +245,45 @@ class AppTheme {
       ),
     );
   }
+
+  // ---------------------------------------------------------------------------
+  // Shared button styles
+  // ---------------------------------------------------------------------------
+
+  /// The one gold "primary action" button style for the whole portal — Add,
+  /// Save, Submit, Approve, Confirm, Export, and similar CTAs. Solid
+  /// [AppColors.gold] fill with near-black text (WCAG AA contrast — gold on
+  /// dark is ~11:1), a deeper-gold hover/press overlay, and a faded gold for
+  /// the disabled state.
+  ///
+  /// Apply at a call site with e.g.
+  /// `style: ElevatedButton.styleFrom(padding: ...).merge(AppTheme.goldButtonStyle)`
+  /// so a screen's own padding/shape tweaks win while color/hover/disabled
+  /// behavior stays centralized here. Do NOT use this for destructive
+  /// actions (keep those on [AppColors.danger]) or for secondary/outline and
+  /// filter-toggle buttons, which stay as they are.
+  static ButtonStyle get goldButtonStyle => ElevatedButton.styleFrom(
+        backgroundColor: AppColors.gold,
+        foregroundColor: AppColors.dark,
+        disabledBackgroundColor: AppColors.gold.withValues(alpha: 0.35),
+        disabledForegroundColor: AppColors.dark.withValues(alpha: 0.35),
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.control),
+        ),
+        textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+      ).copyWith(
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed)) {
+            return AppColors.goldDark.withValues(alpha: 0.35);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return AppColors.goldDark.withValues(alpha: 0.18);
+          }
+          return null;
+        }),
+      );
 
   // ---------------------------------------------------------------------------
   // Theme-aware colour helpers

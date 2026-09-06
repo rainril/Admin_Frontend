@@ -178,11 +178,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: ElevatedButton(
                     onPressed: () => _snack('Profile changes saved'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.cyan,
-                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
+                    ).merge(AppTheme.goldButtonStyle),
                     child: const Text('Save Changes', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -261,11 +259,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: ElevatedButton(
                     onPressed: () => _snack('Gym information updated'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.gold,
-                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
+                    ).merge(AppTheme.goldButtonStyle),
                     child: const Text('Update Info',
                         style: TextStyle(fontWeight: FontWeight.w600)),
                   ),

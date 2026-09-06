@@ -426,11 +426,9 @@ class _HistorySidebar extends StatelessWidget {
             icon: const Icon(Icons.add, size: 18),
             label: const Text('New Chat'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.cyan,
-              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
+            ).merge(AppTheme.goldButtonStyle),
           ),
         ),
         Expanded(

@@ -265,11 +265,11 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
   Widget _buildFab(BuildContext context) {
     return FloatingActionButton(
       onPressed: _toggle,
-      backgroundColor: AppColors.cyan,
+      backgroundColor: AppColors.gold,
       elevation: 6,
       child: Icon(
         _isOpen ? Icons.close : Icons.chat_bubble_rounded,
-        color: Colors.white,
+        color: AppColors.dark,
         size: 26,
       ),
     );
@@ -565,13 +565,11 @@ class _HistorySidebar extends StatelessWidget {
             icon: const Icon(Icons.add, size: 16),
             label: const Text('New Chat'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.cyan,
-              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
               textStyle: const TextStyle(fontSize: 13),
-            ),
+            ).merge(AppTheme.goldButtonStyle),
           ),
         ),
         Expanded(

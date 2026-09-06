@@ -190,8 +190,8 @@ class _InventoryScreenState extends State<InventoryScreen>
                   );
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary),
-              child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              style: AppTheme.goldButtonStyle,
+              child: const Text('Save', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
             ),
           ],
         );
@@ -211,9 +211,9 @@ class _InventoryScreenState extends State<InventoryScreen>
           actions: [
             TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary),
+              style: AppTheme.goldButtonStyle,
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Send Request', style: TextStyle(color: Colors.white)),
+              child: const Text('Send Request', style: TextStyle(color: AppColors.dark)),
             ),
           ],
         ),
@@ -401,8 +401,8 @@ class _InventoryScreenState extends State<InventoryScreen>
                                 );
                               }
                             },
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                            child: const Text('Add Equipment', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))).merge(AppTheme.goldButtonStyle),
+                            child: const Text('Add Equipment', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
@@ -549,8 +549,8 @@ class _InventoryScreenState extends State<InventoryScreen>
                                 );
                               }
                             },
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                            child: const Text('Add Merch', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))).merge(AppTheme.goldButtonStyle),
+                            child: const Text('Add Merch', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
@@ -721,7 +721,7 @@ class _InventoryScreenState extends State<InventoryScreen>
               actions: [
                 TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary),
+                  style: AppTheme.goldButtonStyle,
                   onPressed: () async {
                     final ok = await EquipmentItemService.updateItem(
                       equipment.id,
@@ -739,7 +739,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       );
                     }
                   },
-                  child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  child: const Text('Save', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
                 ),
               ],
             );
@@ -772,9 +772,9 @@ class _InventoryScreenState extends State<InventoryScreen>
           actions: [
             TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary),
+              style: AppTheme.goldButtonStyle,
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Send Request', style: TextStyle(color: Colors.white)),
+              child: const Text('Send Request', style: TextStyle(color: AppColors.dark)),
             ),
           ],
         ),
@@ -872,9 +872,9 @@ class _InventoryScreenState extends State<InventoryScreen>
             const SizedBox(width: 12),
             ElevatedButton.icon(
               onPressed: _showAddEquipmentDialog,
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('Add Equipment', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+              icon: const Icon(Icons.add, color: AppColors.dark),
+              label: const Text('Add Equipment', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))).merge(AppTheme.goldButtonStyle),
             ),
           ],
         ),
@@ -1044,9 +1044,9 @@ class _InventoryScreenState extends State<InventoryScreen>
             Text('Merch & Price List', style: AppTheme.sectionTitle(context)),
             ElevatedButton.icon(
               onPressed: _showAddMerchDialog,
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('Add Item', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.inventoryPrimary, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+              icon: const Icon(Icons.add, color: AppColors.dark),
+              label: const Text('Add Item', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))).merge(AppTheme.goldButtonStyle),
             ),
           ],
         ),
@@ -1172,14 +1172,13 @@ class _InventoryScreenState extends State<InventoryScreen>
                   child: ElevatedButton(
                     onPressed: p.stock <= 0 ? null : () => _recordSaleForProduct(p),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.inventoryPrimary,
                       elevation: 0,
                       visualDensity: VisualDensity.compact,
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
+                    ).merge(AppTheme.goldButtonStyle),
                     child: Text(
                       p.stock <= 0 ? 'Out of Stock' : 'Record Sale',
-                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: AppColors.dark, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

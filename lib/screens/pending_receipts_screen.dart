@@ -400,13 +400,12 @@ class _ReceiptCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: onApprove,
-                    icon: const Icon(Icons.check, size: 18, color: Colors.white),
+                    icon: const Icon(Icons.check, size: 18, color: AppColors.dark),
                     label: const Text('Approve',
-                        style: TextStyle(color: Colors.white)),
+                        style: TextStyle(color: AppColors.dark)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.cyan,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
+                    ).merge(AppTheme.goldButtonStyle),
                   ),
                 ),
               ],

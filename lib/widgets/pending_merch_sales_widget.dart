@@ -224,12 +224,11 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
                 ElevatedButton(
                   onPressed: () => _confirm(sale),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: accent,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text('Confirm', style: TextStyle(fontSize: 12, color: Colors.white)),
+                  ).merge(AppTheme.goldButtonStyle),
+                  child: const Text('Confirm', style: TextStyle(fontSize: 12, color: AppColors.dark)),
                 ),
               ],
             ),

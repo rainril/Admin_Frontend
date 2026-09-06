@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/attendance_service.dart';
 import '../services/current_user.dart';
 import '../theme/app_theme.dart';
@@ -166,16 +166,14 @@ class _AttendancePageState extends State<AttendancePage>
             ),
             ElevatedButton.icon(
               onPressed: _onManualCheckIn,
-              icon: const Icon(Icons.how_to_reg, size: 18, color: Colors.white),
+              icon: const Icon(Icons.how_to_reg, size: 18, color: AppColors.dark),
               label: const Text('Manual Check In'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: accent,
-                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 elevation: 0,
                 textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
+              ).merge(AppTheme.goldButtonStyle),
             ),
           ],
         ),
@@ -289,11 +287,9 @@ class _AttendancePageState extends State<AttendancePage>
           ElevatedButton(
             onPressed: () => _onApproveApproval(a),
             style: ElevatedButton.styleFrom(
-              backgroundColor: accent,
-              foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            ),
+            ).merge(AppTheme.goldButtonStyle),
             child: const Text('Approve'),
           ),
         ],
@@ -755,11 +751,10 @@ class _AttendancePageState extends State<AttendancePage>
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: accent,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
+                          ).merge(AppTheme.goldButtonStyle),
                           onPressed: () async {
                             final name = nameController.text.trim();
                             if (name.isEmpty) {
@@ -787,7 +782,7 @@ class _AttendancePageState extends State<AttendancePage>
                               _showSnack(result['message'] ?? 'Check-in failed', isError: true);
                             }
                           },
-                          child: const Text('Check In', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          child: const Text('Check In', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ],
@@ -955,11 +950,10 @@ class _AttendancePageState extends State<AttendancePage>
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: accent,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
+                          ).merge(AppTheme.goldButtonStyle),
                           onPressed: () async {
                             final payload = {
                               'name': nameController.text.trim(),
@@ -1005,7 +999,7 @@ class _AttendancePageState extends State<AttendancePage>
                               }
                             }
                           },
-                          child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          child: const Text('Save', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ],

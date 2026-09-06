@@ -390,13 +390,12 @@ class _BillingScreenState extends State<BillingScreen>
                 alignment: Alignment.centerRight,
                 child: ElevatedButton.icon(
                   onPressed: _isSendingEmail ? null : _exportEarningsStatement,
-                  icon: const Icon(Icons.download, size: 16, color: Colors.white),
-                  label: const Text('Export PDF', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  icon: const Icon(Icons.download, size: 16, color: AppColors.dark),
+                  label: const Text('Export PDF', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00B4D8),
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                  ),
+                  ).merge(AppTheme.goldButtonStyle),
                 ),
               ),
             const SizedBox(height: 12),

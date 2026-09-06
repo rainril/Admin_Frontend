@@ -225,18 +225,17 @@ Future<bool> showRecordSaleDialog(
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: accent,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
+                          ).merge(AppTheme.goldButtonStyle),
                           child: submitting
                               ? const SizedBox(
                                   height: 18,
                                   width: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.dark),
                                 )
-                              : const Text('Record Sale', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                              : const Text('Record Sale', style: TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ],
