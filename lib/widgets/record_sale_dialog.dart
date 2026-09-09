@@ -134,6 +134,7 @@ Future<bool> showRecordSaleDialog(
                   DropdownButtonFormField<String>(
                     initialValue: method,
                     isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.cyan),
                     decoration: InputDecoration(
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -187,7 +188,7 @@ Future<bool> showRecordSaleDialog(
                           onPressed: submitting ? null : () => Navigator.pop(context, false),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Theme.of(context).dividerColor),
+                            side: BorderSide(color: AppColors.cyan.withValues(alpha: 0.35)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           child: const Text('Cancel'),

@@ -68,57 +68,66 @@ class Sidebar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ---------------- Branding ----------------
+          // A white header card floating on the cyan rail — matching the
+          // member portal sidebar's layout — instead of the wordmark sitting
+          // flush on the cyan background.
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-            child: Row(
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: const DecorationImage(
-                      image: AssetImage('assets/primefit_logo.jpg'),
-                      fit: BoxFit.cover,
-                    ),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.18),
-                        blurRadius: 14,
-                        spreadRadius: -3,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 14,
+                    spreadRadius: -4,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text.rich(
-                      TextSpan(
-                        style: GoogleFonts.archivoBlack(fontSize: 17, letterSpacing: -0.3),
-                        children: const [
-                          TextSpan(text: 'Prime', style: TextStyle(color: AppColors.dark)),
-                          TextSpan(text: 'Fit', style: TextStyle(color: AppColors.gold)),
-                        ],
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: const DecorationImage(
+                        image: AssetImage('assets/primefit_logo.jpg'),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(
+                        color: AppColors.cyan.withValues(alpha: 0.25),
+                        width: 1.5,
                       ),
                     ),
-                    Text('Admin Portal',
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.75))),
-                  ],
-                )
-              ],
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text.rich(
+                        TextSpan(
+                          style: GoogleFonts.archivoBlack(fontSize: 17, letterSpacing: -0.3),
+                          children: const [
+                            TextSpan(text: 'Prime', style: TextStyle(color: AppColors.darkGray)),
+                            TextSpan(text: 'Fit', style: TextStyle(color: AppColors.gold)),
+                          ],
+                        ),
+                      ),
+                      const Text('Admin Portal',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textMuted)),
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.18)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 4),
 
           // ---------------- Navigation ----------------
           Padding(
@@ -158,7 +167,11 @@ class Sidebar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.14),
+                // A deeper, more saturated teal than the cyan rail behind it,
+                // so this card reads as a distinct elevated panel rather than
+                // a faint wash — same idea as the white active-nav pill, just
+                // tuned for a card that still needs to sit on cyan.
+                color: AppColors.cyanDark,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -327,7 +340,7 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
                         widget.label,
                         style: TextStyle(
                           color: textColor,
-                          fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: active ? FontWeight.w700 : FontWeight.w600,
                           fontSize: 14,
                           letterSpacing: -0.1,
                         ),

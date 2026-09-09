@@ -40,18 +40,18 @@ class PageHeaderBanner extends StatelessWidget {
               children: [
                 Text(
                   eyebrow.toUpperCase(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.2,
-                    color: Colors.white.withValues(alpha: 0.75),
+                    color: AppColors.plum,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(icon, size: 26, color: Colors.white),
+                    Icon(icon, size: 26, color: AppColors.gold),
                     const SizedBox(width: 10),
                     Flexible(
                       child: Text(

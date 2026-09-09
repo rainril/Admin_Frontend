@@ -349,7 +349,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           obscureText: obscure,
           decoration: InputDecoration(
             suffixIcon: IconButton(
-              icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: AppColors.textMuted),
+              icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: AppColors.cyan),
               onPressed: onToggle,
             ),
           ),

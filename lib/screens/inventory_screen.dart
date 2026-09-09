@@ -321,7 +321,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text('Equipment Name', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Equipment Name', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(
                       controller: nameController,
@@ -334,7 +334,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       },
                     ),
                     const SizedBox(height: 16),
-                    const Text('Equipment Description', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Equipment Description', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(
                       controller: descriptionController,
@@ -346,7 +346,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Quantity / Stock', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Quantity / Stock', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(controller: qtyController, keyboardType: TextInputType.number),
                     const SizedBox(height: 24),
@@ -448,7 +448,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text('Merch Name', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Merch Name', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(
                       controller: nameController,
@@ -461,7 +461,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       },
                     ),
                     const SizedBox(height: 16),
-                    const Text('Barcode', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Barcode', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(
                       controller: barcodeController,
@@ -480,7 +480,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Price (₱)', style: TextStyle(fontWeight: FontWeight.w500)),
+                              const Text('Price (₱)', style: TextStyle(fontWeight: FontWeight.w600)),
                               const SizedBox(height: 8),
                               TextField(controller: priceController, keyboardType: TextInputType.number),
                             ],
@@ -491,7 +491,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Opening Stock', style: TextStyle(fontWeight: FontWeight.w500)),
+                              const Text('Opening Stock', style: TextStyle(fontWeight: FontWeight.w600)),
                               const SizedBox(height: 8),
                               TextField(controller: stockController, keyboardType: TextInputType.number),
                             ],
@@ -686,11 +686,12 @@ class _InventoryScreenState extends State<InventoryScreen>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Status', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Status', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       initialValue: status,
                       isExpanded: true,
+                      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.cyan),
                       decoration: const InputDecoration(border: OutlineInputBorder()),
                       items: statusOptions
                           .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -698,7 +699,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       onChanged: (v) => setDialogState(() => status = v!),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Quantity', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Quantity', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(
                       controller: qtyController,
@@ -706,7 +707,7 @@ class _InventoryScreenState extends State<InventoryScreen>
                       decoration: const InputDecoration(border: OutlineInputBorder()),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Location', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Location', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     TextField(
                       controller: locationController,

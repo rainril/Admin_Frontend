@@ -20,15 +20,15 @@ class _BillingScreenState extends State<BillingScreen>
   bool _isSendingEmail = false;
 
   static const Map<String, List<Color>> _paymentStatusColors = {
-    'Paid': [Color(0xFFDCFCE7), Color(0xFF16A34A)],
-    'Pending': [Color(0xFFFEF3C7), Color(0xFFD97706)],
-    'Failed': [Color(0xFFFEE2E2), Color(0xFFDC2626)],
+    'Paid': [AppColors.successBg, AppColors.success],
+    'Pending': [AppColors.warningBg, AppColors.warning],
+    'Failed': [AppColors.dangerBg, AppColors.danger],
   };
 
   static const Map<String, List<Color>> _walkInStatusColors = {
-    'Paid': [Color(0xFFDCFCE7), Color(0xFF16A34A)],
-    'Pending': [Color(0xFFFEF3C7), Color(0xFFD97706)],
-    'Failed': [Color(0xFFFEE2E2), Color(0xFFDC2626)],
+    'Paid': [AppColors.successBg, AppColors.success],
+    'Pending': [AppColors.warningBg, AppColors.warning],
+    'Failed': [AppColors.dangerBg, AppColors.danger],
   };
 
   bool _loadingPayments = true;
@@ -367,20 +367,20 @@ class _BillingScreenState extends State<BillingScreen>
             ),
             const SizedBox(height: AppSpacing.section),
 
-            Text(
+            const Text(
               'Membership Plans',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context)),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppColors.plum),
             ),
             const SizedBox(height: 12),
             _buildMembershipPlanCards(),
             const SizedBox(height: AppSpacing.section),
 
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   'Membership Plan Payments',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context)),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppColors.plum),
                 ),
               ],
             ),
@@ -458,9 +458,9 @@ class _BillingScreenState extends State<BillingScreen>
             ),
             const SizedBox(height: AppSpacing.section),
 
-            Text(
+            const Text(
               'Walk-in Payments',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context)),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppColors.plum),
             ),
             const SizedBox(height: 4),
             Text(

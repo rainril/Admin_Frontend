@@ -11,6 +11,21 @@ class AppColors {
   /// [AppTheme.goldButtonStyle].
   static const goldDark = Color(0xFFC99400);
   static const dark = Color(0xFF0B0B0D);
+
+  /// A visibly dark GRAY (not near-black) — e.g. the "Prime" half of the
+  /// sidebar wordmark, where [dark]/[inventoryHeader] read as indistinguishable
+  /// from solid black against the cyan sidebar.
+  static const darkGray = Color(0xFF424242);
+
+  /// Muted royal-purple accent for section/card titles on white surfaces
+  /// (e.g. "Revenue Analytics", "Walk-in Customers") — complements cyan +
+  /// gold without clashing. See [AppTheme.sectionTitle].
+  static const plum = Color(0xFF7E57C2);
+
+  /// Light, clearly-visible cyan tint for form field ("cell") backgrounds —
+  /// see [AppTheme.inputDecorationTheme]'s fillColor. The same pastel cyan
+  /// already used ad hoc for a few icon badges elsewhere in the app.
+  static const cyanBg = Color(0xFFE0F7FA);
   static const bg = Color(0xFFF7F8FA); // soft off-white main content ground
   static const cardBorder = Color(0xFFE7E9EE);
   static const textMuted = Color(0xFF6B7280);
@@ -210,7 +225,10 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-          side: BorderSide(color: borderColor),
+          // A faint cyan tint instead of a flat neutral border, so
+          // secondary/Cancel-style buttons read as interactive rather than
+          // disabled, without competing with gold's primary-action role.
+          side: BorderSide(color: Color.alphaBlend(AppColors.cyan.withValues(alpha: 0.35), borderColor)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.control),
           ),
@@ -227,8 +245,20 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: cardBg,
-        hintStyle: TextStyle(color: mutedColor),
+        // A clearly-visible cyan "cell" fill instead of a flat white/gray
+        // one, so fields read as designed rather than default. Any TextField
+        // that doesn't set its own fillColor picks this up automatically via
+        // InputDecoration.applyDefaults. Dark mode keeps a subtler blend —
+        // the light-mode pastel would look out of place on a dark surface.
+        fillColor: isDark
+            ? Color.alphaBlend(AppColors.cyan.withValues(alpha: 0.12), cardBg)
+            : AppColors.cyanBg,
+        // Hint/label text tinted cyan-dark to complement the cyan cell,
+        // instead of plain neutral gray. The text actually typed into the
+        // field still uses the theme's normal dark body color, so legibility
+        // isn't affected.
+        hintStyle: TextStyle(color: isDark ? mutedColor : AppColors.cyanDark.withValues(alpha: 0.7)),
+        labelStyle: TextStyle(color: isDark ? mutedColor : AppColors.cyanDark),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.control),
@@ -411,7 +441,7 @@ class AppTheme {
         fontSize: 15.5,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.2,
-        color: heading(context),
+        color: AppColors.plum,
       );
 
   /// The small muted line under a card/section title.

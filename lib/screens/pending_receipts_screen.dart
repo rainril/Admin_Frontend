@@ -146,7 +146,7 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
                   'Review manually-uploaded GCash / Maya payment receipts and approve or reject them.',
               trailing: IconButton(
                 onPressed: _loading ? null : () => _load(),
-                icon: const Icon(Icons.refresh, color: Colors.white),
+                icon: const Icon(Icons.refresh, color: AppColors.gold),
                 tooltip: 'Refresh',
               ),
             ),

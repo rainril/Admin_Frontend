@@ -191,8 +191,8 @@ class _AttendancePageState extends State<AttendancePage>
       children: [
         Row(
           children: [
-            Text('Pending Approvals',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context))),
+            const Text('Pending Approvals',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppColors.plum)),
             const SizedBox(width: 8),
             if (_pendingApprovals.isNotEmpty)
               Container(
@@ -331,8 +331,8 @@ class _AttendancePageState extends State<AttendancePage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Walk-in Customers',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context))),
+        const Text('Walk-in Customers',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppColors.plum)),
         const SizedBox(height: 4),
         const Text('Customers without a membership plan, checked in manually.',
             style: TextStyle(fontSize: 13, color: mutedText)),
@@ -381,7 +381,7 @@ class _AttendancePageState extends State<AttendancePage>
             decoration: BoxDecoration(border: Border.all(color: Theme.of(context).dividerColor), borderRadius: BorderRadius.circular(8)),
             child: Row(
               children: [
-                const Icon(Icons.search, size: 18, color: mutedText),
+                Icon(Icons.search, size: 18, color: AppColors.cyanDark.withValues(alpha: 0.55)),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
@@ -406,7 +406,7 @@ class _AttendancePageState extends State<AttendancePage>
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _statusFilter,
-              icon: const Icon(Icons.keyboard_arrow_down, size: 18),
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.cyan),
               items: ['All Status', ..._statusOptions].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (v) => setState(() => _statusFilter = v!),
             ),
@@ -478,8 +478,7 @@ class _AttendancePageState extends State<AttendancePage>
       children: [
         IconButton(
           onPressed: () => _onEditWalkIn(r),
-          icon: const Icon(Icons.edit_outlined, size: 18),
-          color: mutedText,
+          icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.blueIcon),
           splashRadius: 18,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
@@ -487,8 +486,7 @@ class _AttendancePageState extends State<AttendancePage>
         const SizedBox(width: 12),
         IconButton(
           onPressed: () => _onDeleteWalkIn(r),
-          icon: const Icon(Icons.delete_outline, size: 18),
-          color: mutedText,
+          icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.danger),
           splashRadius: 18,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
@@ -506,8 +504,8 @@ class _AttendancePageState extends State<AttendancePage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Member Check-ins',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppTheme.heading(context))),
+        const Text('Member Check-ins',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppColors.plum)),
         const SizedBox(height: 4),
         const Text('Members on a plan, checked in via the Scan page (QR).',
             style: TextStyle(fontSize: 13, color: mutedText)),
@@ -525,7 +523,7 @@ class _AttendancePageState extends State<AttendancePage>
                   decoration: BoxDecoration(border: Border.all(color: Theme.of(context).dividerColor), borderRadius: BorderRadius.circular(8)),
                   child: Row(
                     children: [
-                      const Icon(Icons.search, size: 18, color: mutedText),
+                      Icon(Icons.search, size: 18, color: AppColors.cyanDark.withValues(alpha: 0.55)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
@@ -708,7 +706,7 @@ class _AttendancePageState extends State<AttendancePage>
                   ),
                   const SizedBox(height: 16),
                   _fieldLabel('Total Payment'),
-                  _dialogField(controller: amountController, hint: '0', prefixText: '₱ ', keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                  _dialogField(controller: amountController, hint: '0', prefixText: '₱ ', keyboardType: const TextInputType.numberWithOptions(decimal: true), fillTint: AppColors.goldBg),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -741,7 +739,7 @@ class _AttendancePageState extends State<AttendancePage>
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Theme.of(context).dividerColor),
+                            side: BorderSide(color: AppColors.cyan.withValues(alpha: 0.35)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           child: Text('Cancel', style: TextStyle(color: AppTheme.heading(context), fontWeight: FontWeight.w600)),
@@ -799,20 +797,45 @@ class _AttendancePageState extends State<AttendancePage>
   Widget _fieldLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.heading(context))),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 3,
+            height: 12,
+            margin: const EdgeInsets.only(right: 6),
+            decoration: BoxDecoration(
+              color: accent,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.heading(context))),
+        ],
+      ),
     );
   }
 
-  Widget _dialogField({required TextEditingController controller, String? hint, String? prefixText, TextInputType? keyboardType}) {
+  /// [fillTint] lets a specific field (e.g. Total Payment) use a different
+  /// subtle background tint than the app-wide cyan default from
+  /// [AppTheme]'s InputDecorationTheme — pass null to keep that default.
+  Widget _dialogField({
+    required TextEditingController controller,
+    String? hint,
+    String? prefixText,
+    TextInputType? keyboardType,
+    Color? fillTint,
+  }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: mutedText, fontSize: 13),
+        hintStyle: TextStyle(color: AppColors.cyanDark.withValues(alpha: 0.7), fontSize: 13),
         prefixText: prefixText,
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        filled: fillTint != null ? true : null,
+        fillColor: fillTint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Theme.of(context).dividerColor)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Theme.of(context).dividerColor)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: accent)),
@@ -824,6 +847,7 @@ class _AttendancePageState extends State<AttendancePage>
     return DropdownButtonFormField<String>(
       initialValue: value,
       isExpanded: true,
+      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.cyan),
       decoration: InputDecoration(
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -907,7 +931,7 @@ class _AttendancePageState extends State<AttendancePage>
                   ),
                   const SizedBox(height: 16),
                   _fieldLabel('Total Payment'),
-                  _dialogField(controller: amountController, hint: '0', prefixText: '₱ ', keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                  _dialogField(controller: amountController, hint: '0', prefixText: '₱ ', keyboardType: const TextInputType.numberWithOptions(decimal: true), fillTint: AppColors.goldBg),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -940,7 +964,7 @@ class _AttendancePageState extends State<AttendancePage>
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Theme.of(context).dividerColor),
+                            side: BorderSide(color: AppColors.cyan.withValues(alpha: 0.35)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           child: Text('Cancel', style: TextStyle(color: AppTheme.heading(context), fontWeight: FontWeight.w600)),

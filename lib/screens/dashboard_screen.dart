@@ -253,6 +253,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               crossAxisSpacing: 16,
               childAspectRatio: statCols == 1 ? 2.8 : 1.5,
               children: isOwner ? _ownerStatCards() : _staffStatCards(),
+
             ),
             const SizedBox(height: AppSpacing.section),
 
