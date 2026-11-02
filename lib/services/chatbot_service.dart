@@ -1,8 +1,9 @@
+import 'api_endpoints.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ChatbotService {
-  static const String _baseUrl = 'http://127.0.0.1:8000/api';
+  static const String _baseUrl = AdminApiEndpoints.baseUrl;
 
   /// [history] is the conversation-so-far for the active chat session
   /// (role/content pairs, oldest first), NOT including [text].

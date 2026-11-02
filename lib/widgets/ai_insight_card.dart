@@ -1,3 +1,4 @@
+import '../services/api_endpoints.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,7 @@ class AiInsightCard extends StatefulWidget {
 }
 
 class _AiInsightCardState extends State<AiInsightCard> {
-  static const String _baseUrl = 'http://127.0.0.1:8000/api';
+  static const String _baseUrl = AdminApiEndpoints.baseUrl;
 
   String? _summary;
   bool _loading = true;

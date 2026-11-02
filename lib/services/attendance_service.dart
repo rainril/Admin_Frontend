@@ -1,8 +1,9 @@
+import 'api_endpoints.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AttendanceService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = AdminApiEndpoints.baseUrl;
 
   // Kunin ang listahan ng lahat ng members (para sa Test QR Codes, dropdown)
   static Future<List<Map<String, dynamic>>> getMembers() async {

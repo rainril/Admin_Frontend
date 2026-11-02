@@ -1,10 +1,11 @@
+import 'api_endpoints.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 /// Fetches the real dashboard numbers (subscriptions, members, revenue,
 /// attendance rate) from the Laravel /api/dashboard-stats route.
 class DashboardStatsService {
-  static const String _baseUrl = 'http://127.0.0.1:8000/api';
+  static const String _baseUrl = AdminApiEndpoints.baseUrl;
 
   static Future<DashboardStats?> fetch() async {
     try {

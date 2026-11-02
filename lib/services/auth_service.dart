@@ -1,3 +1,4 @@
+import 'api_endpoints.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   // Kung web/desktop ang Flutter app mo, 127.0.0.1 ang gamitin.
   // Kung Android emulator, palitan mo ng 10.0.2.2
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = AdminApiEndpoints.baseUrl;
 
   // LOGIN
   static Future<Map<String, dynamic>> login(String email, String password) async {

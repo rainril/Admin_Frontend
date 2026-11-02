@@ -1,3 +1,4 @@
+import 'api_endpoints.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -6,7 +7,7 @@ import 'package:http/http.dart' as http;
 /// Laravel API. If you already have a shared ApiConfig/api constants file,
 /// delete this class and import that one instead.
 class ApiConfig {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = AdminApiEndpoints.baseUrl;
 }
 
 class ChurnRiskMember {
