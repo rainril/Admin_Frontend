@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'api_endpoints.dart';
 
 /// Base host for the plain-PHP billing endpoint (`billing_api.php`) that backs
 /// manual GCash / Maya receipt review. This one lives *outside* Laravel's
@@ -150,13 +153,42 @@ class ReceiptActionResult {
 }
 
 class PendingReceiptService {
+  static Future<Map<String, String>> _headers() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null || token.isEmpty) throw Exception('Please sign in as an admin.');
+    return {'Accept': 'application/json', 'Authorization': 'Bearer $token'};
+  }
+
+  static String _path(String paymentId) {
+    final parts = paymentId.split('-');
+    if (parts.length != 2 || int.tryParse(parts[1]) == null) throw Exception('Invalid request ID');
+    if (parts[0] == 'R') return 'pending-registrations/${parts[1]}';
+    if (parts[0] == 'P') return 'pending-payments/${parts[1]}';
+    throw Exception('Invalid request ID');
+  }
+
+  static Future<Uint8List> loadReceipt(String paymentId) async {
+    final res = await http.get(Uri.parse('${AdminApiEndpoints.baseUrl}/${_path(paymentId)}/receipt'), headers: await _headers());
+    if (res.statusCode != 200) throw Exception('Could not load receipt.');
+    return res.bodyBytes;
+  }
+
+  static Future<List<Map<String, dynamic>>> listApprovedPayments() async {
+    final res = await http.get(Uri.parse('${AdminApiEndpoints.baseUrl}/reviewed-payments'), headers: await _headers());
+    if (res.statusCode != 200) throw Exception('Could not load approved payments.');
+    final decoded = json.decode(res.body);
+    if (decoded is! Map || decoded['payments'] is! List) throw Exception('Invalid response.');
+    return (decoded['payments'] as List).whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
+  }
   /// GET billing_api.php?action=list_pending_receipts
   ///
   /// Throws on a network error or non-200 response so the screen can show its
   /// retry state.
   static Future<List<PendingReceipt>> listPendingReceipts() async {
     final res = await http.get(
-      Uri.parse('${BillingApiConfig.endpoint}?action=list_pending_receipts'),
+      Uri.parse('${AdminApiEndpoints.baseUrl}/pending-registrations'),
+      headers: await _headers(),
     );
 
     if (res.statusCode != 200) {
@@ -195,9 +227,13 @@ class PendingReceiptService {
   static Future<ReceiptActionResult> _postAction(
       String action, Map<String, dynamic> body) async {
     try {
+      final paymentId = body['payment_id']?.toString() ?? '';
+      final decision = action == 'approve_receipt' ? 'approve' : 'reject';
+      final headers = await _headers();
+      headers['Content-Type'] = 'application/json';
       final res = await http.post(
-        Uri.parse('${BillingApiConfig.endpoint}?action=$action'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('${AdminApiEndpoints.baseUrl}/${_path(paymentId)}/$decision'),
+        headers: headers,
         body: json.encode(body),
       );
 

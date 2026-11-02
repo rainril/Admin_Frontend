@@ -22,6 +22,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
   static const Map<String, List<Color>> _subscriptionColors = {
     'active': [AppColors.successBg, AppColors.success],
     'expiring_soon': [AppColors.warningBg, AppColors.warning],
+    'pending': [AppColors.warningBg, AppColors.warning],
     'expired': [AppColors.dangerBg, AppColors.danger],
   };
 
@@ -77,6 +78,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
     final colors = _subscriptionColors[subscriptionStatus] ??
         [const Color(0xFFF1F1F3), AppTheme.textMuted(context)];
     final isExpired = subscriptionStatus == 'expired';
+    final isPending = subscriptionStatus == 'pending';
     final name = member['name'] ?? '';
     final email = member['email'] ?? '';
     final qrId = member['id'] ?? '';
@@ -147,7 +149,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: isExpired ? AppColors.danger : gold,
             ),
-            onPressed: () async {
+            onPressed: isPending ? null : () async {
               Navigator.pop(dialogContext);
 
               final result = await AttendanceService.recordCheckIn(
@@ -169,7 +171,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
               }
             },
             child: Text(
-              isExpired ? 'Check In Anyway' : 'Confirm Check-In',
+              isPending ? 'Awaiting payment approval' : (isExpired ? 'Check In Anyway' : 'Confirm Check-In'),
               style: TextStyle(color: isExpired ? Colors.white : Colors.black87, fontWeight: FontWeight.w700),
             ),
           ),

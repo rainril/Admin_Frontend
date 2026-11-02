@@ -1,7 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../services/pending_receipt_service.dart';
-import '../services/payment_data.dart';
-import '../services/payment_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/tab_visibility.dart';
 
@@ -25,28 +24,13 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
   bool _loading = true;
   String? _error;
   List<PendingReceipt> _receipts = [];
+  List<Map<String, dynamic>> _approved = [];
   final Set<String> _actingOn = {};
   String? _expandedId;
 
-  // Approved (Paid) membership payments come from the same shared store the
-  // Billing screen uses.
+  // Approved payments are read from the member database.
   bool _loadingApproved = true;
-
-  @override
-  void initState() {
-    super.initState();
-    PaymentData.instance.addListener(_onDataChanged);
-  }
-
-  @override
-  void dispose() {
-    PaymentData.instance.removeListener(_onDataChanged);
-    super.dispose();
-  }
-
-  void _onDataChanged() {
-    if (mounted) setState(() {});
-  }
+  bool _approvedFailed = false;
 
   // Refresh quietly while the tab is visible, like the other admin screens.
   @override
@@ -92,8 +76,11 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
   Future<void> _loadApproved({bool silent = false}) async {
     if (!silent) setState(() => _loadingApproved = true);
     try {
-      await PaymentService.getMembershipPayments();
-    } catch (_) {}
+      final payments = await PendingReceiptService.listApprovedPayments();
+      if (mounted) setState(() { _approved = payments; _approvedFailed = false; });
+    } catch (_) {
+      if (mounted && _approved.isEmpty) setState(() => _approvedFailed = true);
+    }
     if (mounted) setState(() => _loadingApproved = false);
   }
 
@@ -121,45 +108,24 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
   }
 
   Future<String?> _askReason() async {
-    final ctrl = TextEditingController();
-    final result = await showDialog<String>(
+    return showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Reject receipt'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Add an optional reason for rejecting this payment receipt.',
-              style: AppTheme.cardSubtitle(context),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: ctrl,
-              autofocus: true,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: 'e.g. amount does not match the plan price',
-              ),
-            ),
-          ],
-        ),
+        content: const Text('Reject this payment receipt?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+            onPressed: () => Navigator.pop(ctx, ''),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             child: const Text('Reject', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
-    ctrl.dispose();
-    return result;
   }
 
   void _toast(String msg, bool ok) {
@@ -175,7 +141,7 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
   // ---------- Approved payments (Paid membership payments), newest first ----------
 
   List<Map> _approvedPayments() {
-    final list = PaymentData.instance.payments
+    final list = _approved
         .where((p) => (p['status'] ?? '').toString() == 'Paid')
         .toList();
     list.sort((a, b) {
@@ -278,8 +244,9 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
 
   Widget _summaryRow(int approvedCount) {
     final total = _receipts.length;
+    final checked = _receipts.where((r) => r.ocrAmount.isNotEmpty).length;
     final matching = _receipts.where((r) => r.amountMatches).length;
-    final matchRate = total == 0 ? '—' : '${(matching * 100 / total).round()}%';
+    final matchRate = checked == 0 ? '—' : '${(matching * 100 / checked).round()}%';
     final waiting = _loading && _receipts.isEmpty;
 
     return Row(
@@ -294,7 +261,7 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
         const SizedBox(width: 16),
         _summaryCard(
           label: 'Approved Payments',
-          value: _loadingApproved && approvedCount == 0 ? '—' : '$approvedCount',
+          value: (_loadingApproved && approvedCount == 0) || _approvedFailed ? '—' : '$approvedCount',
           caption: 'Confirmed and paid',
         ),
         const SizedBox(width: 16),
@@ -434,6 +401,10 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
   // ---------- Approved payments list ----------
 
   Widget _approvedBody(List<Map> approved) {
+    if (_approvedFailed && approved.isEmpty) {
+      return _panel(context, padding: const EdgeInsets.symmetric(vertical: 40),
+        child: const Center(child: Text('Could not load approved payments.')));
+    }
     if (_loadingApproved && approved.isEmpty) {
       return _panel(
         context,
@@ -750,10 +721,10 @@ class _ReceiptRow extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: _badge(
-                        matches ? 'Amount matches' : 'Amount mismatch',
-                        matches ? AppColors.successBg : AppColors.dangerBg,
-                        matches ? AppColors.success : AppColors.danger,
-                        icon: matches ? Icons.check_circle_rounded : Icons.error_rounded,
+                        receipt.ocrAmount.isEmpty ? 'Review manually' : (matches ? 'Amount matches' : 'Amount mismatch'),
+                        receipt.ocrAmount.isEmpty ? AppColors.warningBg : (matches ? AppColors.successBg : AppColors.dangerBg),
+                        receipt.ocrAmount.isEmpty ? AppColors.warning : (matches ? AppColors.success : AppColors.danger),
+                        icon: receipt.ocrAmount.isEmpty ? Icons.search : (matches ? Icons.check_circle_rounded : Icons.error_rounded),
                       ),
                     ),
                   ),
@@ -814,20 +785,19 @@ class _ReceiptRow extends StatelessWidget {
               constraints: const BoxConstraints(maxHeight: 420),
               alignment: Alignment.center,
               color: AppTheme.subtleFill(context),
-              child: receipt.receiptImageUrl.isEmpty
-                  ? _imgPlaceholder(context, 'No receipt image provided')
-                  : Image.network(
-                      receipt.receiptImageUrl,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (c, child, progress) => progress == null
-                          ? child
-                          : const Padding(
-                              padding: EdgeInsets.all(40),
-                              child: CircularProgressIndicator(),
-                            ),
-                      errorBuilder: (c, e, s) =>
-                          _imgPlaceholder(context, 'Could not load receipt image'),
-                    ),
+              child: FutureBuilder<Uint8List>(
+                future: PendingReceiptService.loadReceipt(receipt.paymentId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return _imgPlaceholder(context, 'Could not load receipt image');
+                  }
+                  if (!snapshot.hasData) {
+                    return const Padding(
+                      padding: EdgeInsets.all(40), child: CircularProgressIndicator());
+                  }
+                  return Image.memory(snapshot.data!, fit: BoxFit.contain);
+                },
+              ),
             ),
           ),
           const SizedBox(height: 16),

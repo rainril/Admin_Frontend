@@ -52,9 +52,11 @@ class AuthService {
     required String password,
     required String adminLevel,
   }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
     final response = await http.post(
       Uri.parse('$baseUrl/register'),
-      headers: {'Accept': 'application/json'},
+      headers: {'Accept': 'application/json', if (token != null) 'Authorization': 'Bearer $token'},
       body: {
         'firstName': firstName,
         'lastName': lastName,
