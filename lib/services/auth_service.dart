@@ -85,13 +85,54 @@ class AuthService {
   // LOGOUT
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    final token = prefs.getString('token');
+    if (token != null && token.isNotEmpty) {
+      try {
+        await http.post(
+          Uri.parse('$baseUrl/logout'),
+          headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+        ).timeout(const Duration(seconds: 5));
+      } catch (_) {
+        // Always clear the browser session even when the server is offline.
+      }
+    }
+    await _clearSavedUser(prefs);
   }
 
-  // CHECK IF LOGGED IN
-  static Future<bool> isLoggedIn() async {
+  static Future<void> _clearSavedUser(SharedPreferences prefs) async {
+    await prefs.remove('token');
+    await prefs.remove('admin_level');
+    await prefs.remove('first_name');
+    await prefs.remove('last_name');
+    await prefs.remove('account_id');
+    await prefs.remove('email');
+  }
+
+  /// Verifies the saved Sanctum token with the server before restoring UI state.
+  /// Returns null when there is no session or the server has revoked it.
+  static Future<Map<String, dynamic>?> restoreSession() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') != null;
+    final token = prefs.getString('token');
+    if (token == null || token.isEmpty) return null;
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/user'),
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      await prefs.setString('admin_level', data['adminLevel'] ?? '');
+      await prefs.setString('first_name', data['firstName'] ?? '');
+      await prefs.setString('last_name', data['lastName'] ?? '');
+      await prefs.setInt('account_id', data['accountId'] ?? 0);
+      await prefs.setString('email', data['email'] ?? '');
+      return data;
+    }
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      await _clearSavedUser(prefs);
+      return null;
+    }
+    throw Exception('Unable to verify the saved admin session.');
   }
 
   // GET CURRENT ADMIN LEVEL (owner o staff)

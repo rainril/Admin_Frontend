@@ -14,6 +14,7 @@ import 'settings_screen.dart';
 import 'pending_receipts_screen.dart';
 import 'login_screen.dart';
 import '../services/current_user.dart';
+import '../services/auth_service.dart';
 import '../services/notification_center.dart';
 
 class AppShell extends StatefulWidget {
@@ -52,9 +53,11 @@ class _AppShellState extends State<AppShell> {
 
   void _onSelect(int i) => setState(() => _index = i);
 
-  void _logout() {
+  Future<void> _logout() async {
+    await AuthService.logout();
     CurrentUser.clear();
     NotificationCenter.instance.reset();
+    if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
