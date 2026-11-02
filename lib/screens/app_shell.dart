@@ -3,7 +3,9 @@ import '../theme/app_theme.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/floating_chatbot.dart';
 import '../widgets/tab_visibility.dart';
+import '../widgets/notification_bell.dart';
 import 'dashboard_screen.dart';
+import 'notifications_screen.dart';
 import 'billing_screen.dart';
 import 'attendance_page.dart';
 import 'scan_checkin_page.dart';
@@ -12,6 +14,7 @@ import 'settings_screen.dart';
 import 'pending_receipts_screen.dart';
 import 'login_screen.dart';
 import '../services/current_user.dart';
+import '../services/notification_center.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key, this.initialIndex = 0});
@@ -25,8 +28,21 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _index = 0;
 
-  static const _titles = ['Dashboard', 'Attendance', 'Scan', 'Billing', 'Pending Payments', 'Inventory', 'Settings'];
-  static const int scanIndex = 2;
+  // NOTE: Notifications was added at index 1, so every screen after Dashboard
+  // moved down by one. Keep this list, the sidebar items and _screens in the
+  // same order.
+  static const _titles = [
+    'Dashboard',
+    'Notifications',
+    'Attendance',
+    'Scan',
+    'Billing',
+    'Pending Payments',
+    'Inventory',
+    'Settings',
+  ];
+  static const int notificationsIndex = 1;
+  static const int scanIndex = 3;
 
   @override
   void initState() {
@@ -38,6 +54,7 @@ class _AppShellState extends State<AppShell> {
 
   void _logout() {
     CurrentUser.clear();
+    NotificationCenter.instance.reset();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
@@ -51,13 +68,29 @@ class _AppShellState extends State<AppShell> {
 
   List<Widget> get _screens => [
         _tab(0, const DashboardScreen()),
-        _tab(1, AttendancePage(onGoToScan: () => _onSelect(scanIndex))),
-        _tab(2, const ScanCheckInPage()),
-        _tab(3, const BillingScreen()),
-        _tab(4, const PendingReceiptsScreen()),
-        _tab(5, const InventoryScreen()),
-        _tab(6, const SettingsScreen()),
+        _tab(1, const NotificationsScreen()),
+        _tab(2, AttendancePage(onGoToScan: () => _onSelect(scanIndex))),
+        _tab(3, const ScanCheckInPage()),
+        _tab(4, const BillingScreen()),
+        _tab(5, const PendingReceiptsScreen()),
+        _tab(6, const InventoryScreen()),
+        _tab(7, const SettingsScreen()),
       ];
+
+  /// Slim bar above every screen with the notification bell at the top right.
+  Widget _topBar() {
+    return Container(
+      height: 64,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      alignment: Alignment.centerRight,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor)),
+      ),
+      child: NotificationBell(onTap: () => _onSelect(notificationsIndex)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,12 +106,19 @@ class _AppShellState extends State<AppShell> {
                 child: Container(
                   color: AppTheme.pageBackground(context),
                   child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: IndexedStack(
-                        index: _index,
-                        children: _screens,
-                      ),
+                    child: Column(
+                      children: [
+                        _topBar(),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: IndexedStack(
+                              index: _index,
+                              children: _screens,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -96,6 +136,14 @@ class _AppShellState extends State<AppShell> {
           foregroundColor: Colors.white,
           iconTheme: const IconThemeData(color: Colors.white),
           title: Text(_titles[_index], style: const TextStyle(color: Colors.white)),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Center(
+                child: NotificationBell(onTap: () => _onSelect(notificationsIndex)),
+              ),
+            ),
+          ],
         ),
         drawer: Drawer(
           child: Sidebar(

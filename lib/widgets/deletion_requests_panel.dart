@@ -19,8 +19,6 @@ class DeletionRequestsPanel extends StatefulWidget {
 }
 
 class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
-  static const Color mutedText = AppColors.textMuted;
-
   List<DeletionRequestItem> _pending = [];
   bool _loading = true;
   final Set<int> _actingOn = {};
@@ -105,7 +103,7 @@ class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
                 ),
                 IconButton(
                   onPressed: refresh,
-                  icon: const Icon(Icons.refresh, size: 18, color: mutedText),
+                  icon: Icon(Icons.refresh, size: 18, color: AppTheme.textMuted(context)),
                   tooltip: 'Refresh',
                 ),
               ],
@@ -141,7 +139,7 @@ class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
                   TextSpan(text: req.itemName, style: const TextStyle(fontWeight: FontWeight.w600)),
                   TextSpan(
                     text: '  ($typeLabel)${req.requestedBy != null ? " · requested by ${req.requestedBy}" : ""}',
-                    style: const TextStyle(color: mutedText, fontSize: 12),
+                    style: TextStyle(color: AppTheme.textMuted(context), fontSize: 12),
                   ),
                 ],
               ),
@@ -156,7 +154,7 @@ class DeletionRequestsPanelState extends State<DeletionRequestsPanel> {
                 OutlinedButton(
                   onPressed: () => _reject(req),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: mutedText,
+                    foregroundColor: AppTheme.textMuted(context),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),

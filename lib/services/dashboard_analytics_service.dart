@@ -316,9 +316,11 @@ class DashboardAnalyticsService {
     }
   }
 
-  static Future<ChartSeries?> fetchAttendanceAnalytics() async {
+  /// period: 'weekly' (default, unchanged) | 'monthly'
+  static Future<ChartSeries?> fetchAttendanceAnalytics([String period = 'weekly']) async {
     try {
-      final res = await http.get(Uri.parse('${ApiConfig.baseUrl}/dashboard/attendance-analytics'));
+      final res = await http.get(
+          Uri.parse('${ApiConfig.baseUrl}/dashboard/attendance-analytics?period=$period'));
       if (res.statusCode != 200) return null;
       return ChartSeries.fromJson(json.decode(res.body));
     } catch (_) {

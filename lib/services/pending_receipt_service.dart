@@ -13,12 +13,29 @@ class BillingApiConfig {
 
   /// Turn a receipt's `receipt_url` (which may come back absolute, or relative
   /// to the backend root) into a full, loadable image URL.
+  ///
+  /// The stored path (e.g. `uploads/receipts/xxx.jpg`) is relative to the
+  /// memberaccount project root, NOT the Apache document root -- the file
+  /// actually lives under htdocs/memberaccount/uploads/receipts/, same as
+  /// `endpoint` above. Without the `/memberaccount` prefix this built a URL
+  /// like `http://127.0.0.1/uploads/receipts/xxx.jpg`, which 404s.
   static String receiptImageUrl(String receiptUrl) {
     if (receiptUrl.isEmpty) return '';
     if (receiptUrl.startsWith('http://') || receiptUrl.startsWith('https://')) {
       return receiptUrl;
     }
-    return receiptUrl.startsWith('/') ? '$host$receiptUrl' : '$host/$receiptUrl';
+
+    final cleanPath = receiptUrl.startsWith('/')
+        ? receiptUrl.substring(1)
+        : receiptUrl;
+
+    // Already includes the memberaccount segment (e.g. a future backend
+    // change starts returning it) -- don't double it up.
+    if (cleanPath.startsWith('memberaccount/')) {
+      return '$host/$cleanPath';
+    }
+
+    return '$host/memberaccount/$cleanPath';
   }
 }
 
@@ -38,6 +55,7 @@ class PendingReceipt {
   final String ocrReference;
   final bool amountMatches;
   final String receiptUrl;
+  final String purpose;
 
   PendingReceipt({
     required this.paymentId,
@@ -51,6 +69,7 @@ class PendingReceipt {
     required this.ocrReference,
     required this.amountMatches,
     required this.receiptUrl,
+    required this.purpose,
   });
 
   String get receiptImageUrl => BillingApiConfig.receiptImageUrl(receiptUrl);
@@ -116,6 +135,10 @@ class PendingReceipt {
         'image_url',
         'receipt_path',
       ]),
+      purpose: () {
+        final p = pick(['purpose', 'payment_purpose', 'type']);
+        return p.isEmpty ? 'New Registration' : p;
+      }(),
     );
   }
 }

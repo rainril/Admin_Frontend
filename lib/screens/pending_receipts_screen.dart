@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import '../services/pending_receipt_service.dart';
+import '../services/payment_data.dart';
+import '../services/payment_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/tab_visibility.dart';
-import '../widgets/page_header_banner.dart';
 
 /// Review queue for manually-uploaded GCash / Maya payment receipts. An admin
 /// eyeballs the receipt image against the OCR-extracted amount / reference and
 /// then approves or rejects it.
+///
+/// Layout (Haws Prints "Review Management" style):
+///   1. Three summary cards (pending / approved / amount match rate)
+///   2. Pending receipts table (click a row to open the receipt + actions)
+///   3. Approved payments table
 class PendingReceiptsScreen extends StatefulWidget {
   const PendingReceiptsScreen({super.key});
 
@@ -22,15 +28,41 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
   final Set<String> _actingOn = {};
   String? _expandedId;
 
+  // Approved (Paid) membership payments come from the same shared store the
+  // Billing screen uses.
+  bool _loadingApproved = true;
+
+  @override
+  void initState() {
+    super.initState();
+    PaymentData.instance.addListener(_onDataChanged);
+  }
+
+  @override
+  void dispose() {
+    PaymentData.instance.removeListener(_onDataChanged);
+    super.dispose();
+  }
+
+  void _onDataChanged() {
+    if (mounted) setState(() {});
+  }
+
   // Refresh quietly while the tab is visible, like the other admin screens.
   @override
   Duration get pollInterval => const Duration(seconds: 30);
 
   @override
-  void onInitialLoad() => _load();
+  void onInitialLoad() {
+    _load();
+    _loadApproved();
+  }
 
   @override
-  void onPoll() => _load(silent: true);
+  void onPoll() {
+    _load(silent: true);
+    _loadApproved(silent: true);
+  }
 
   Future<void> _load({bool silent = false}) async {
     if (!silent) {
@@ -57,13 +89,24 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
     }
   }
 
+  Future<void> _loadApproved({bool silent = false}) async {
+    if (!silent) setState(() => _loadingApproved = true);
+    try {
+      await PaymentService.getMembershipPayments();
+    } catch (_) {}
+    if (mounted) setState(() => _loadingApproved = false);
+  }
+
   Future<void> _approve(PendingReceipt r) async {
     setState(() => _actingOn.add(r.paymentId));
     final res = await PendingReceiptService.approveReceipt(r.paymentId);
     if (!mounted) return;
     setState(() => _actingOn.remove(r.paymentId));
     _toast(res.success ? 'Receipt approved.' : res.message, res.success);
-    if (res.success) _load(silent: true);
+    if (res.success) {
+      _load(silent: true);
+      _loadApproved(silent: true);
+    }
   }
 
   Future<void> _reject(PendingReceipt r) async {
@@ -129,8 +172,27 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
     );
   }
 
+  // ---------- Approved payments (Paid membership payments), newest first ----------
+
+  List<Map> _approvedPayments() {
+    final list = PaymentData.instance.payments
+        .where((p) => (p['status'] ?? '').toString() == 'Paid')
+        .toList();
+    list.sort((a, b) {
+      final da = DateTime.tryParse((a['date'] ?? '').toString());
+      final db = DateTime.tryParse((b['date'] ?? '').toString());
+      if (da == null && db == null) return 0;
+      if (da == null) return 1;
+      if (db == null) return -1;
+      return db.compareTo(da);
+    });
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final approved = _approvedPayments();
+
     return Scaffold(
       backgroundColor: AppTheme.pageBackground(context),
       body: SingleChildScrollView(
@@ -138,31 +200,168 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PageHeaderBanner(
-              eyebrow: 'Receipts',
-              icon: Icons.receipt_long_outlined,
-              title: 'Pending Payment Receipts',
-              subtitle:
-                  'Review manually-uploaded GCash / Maya payment receipts and approve or reject them.',
-              trailing: IconButton(
-                onPressed: _loading ? null : () => _load(),
-                icon: const Icon(Icons.refresh, color: AppColors.gold),
-                tooltip: 'Refresh',
-              ),
-            ),
+            _header(),
             const SizedBox(height: AppSpacing.section),
-            _body(),
+            _summaryRow(approved.length),
+            const SizedBox(height: AppSpacing.section),
+
+            Text('Pending Payments', style: _sectionTitleStyle(context)),
+            const SizedBox(height: 4),
+            Text('Receipts waiting for your review.',
+                style: TextStyle(fontSize: 13, color: AppTheme.textMuted(context))),
+            const SizedBox(height: 12),
+            _pendingBody(),
+            const SizedBox(height: AppSpacing.section),
+
+            Text('Approved Payments', style: _sectionTitleStyle(context)),
+            const SizedBox(height: 4),
+            Text('Membership payments that have been confirmed.',
+                style: TextStyle(fontSize: 13, color: AppTheme.textMuted(context))),
+            const SizedBox(height: 12),
+            _approvedBody(approved),
           ],
         ),
       ),
     );
   }
 
-  Widget _body() {
+  // ---------- Header ----------
+
+  Widget _header() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Pending Payment Receipts',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                  color: AppTheme.heading(context),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Review manually-uploaded GCash / Maya payment receipts and approve or reject them.',
+                style: TextStyle(fontSize: 14, color: AppTheme.textMuted(context)),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 16),
+        OutlinedButton.icon(
+          onPressed: _loading
+              ? null
+              : () {
+                  _load();
+                  _loadApproved();
+                },
+          icon: const Icon(Icons.refresh, size: 18),
+          label: const Text('Refresh'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppTheme.heading(context),
+            side: BorderSide(color: AppTheme.heading(context).withValues(alpha: 0.35)),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+            textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---------- Summary cards ----------
+
+  Widget _summaryRow(int approvedCount) {
+    final total = _receipts.length;
+    final matching = _receipts.where((r) => r.amountMatches).length;
+    final matchRate = total == 0 ? '—' : '${(matching * 100 / total).round()}%';
+    final waiting = _loading && _receipts.isEmpty;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _summaryCard(
+          label: 'Pending Payments',
+          value: waiting ? '—' : '$total',
+          caption: 'Awaiting review',
+          accent: total > 0 ? AppColors.warning : null,
+        ),
+        const SizedBox(width: 16),
+        _summaryCard(
+          label: 'Approved Payments',
+          value: _loadingApproved && approvedCount == 0 ? '—' : '$approvedCount',
+          caption: 'Confirmed and paid',
+        ),
+        const SizedBox(width: 16),
+        _summaryCard(
+          label: 'Amount Match Rate',
+          value: waiting ? '—' : matchRate,
+          caption: 'Pending receipts matching the plan price',
+        ),
+      ],
+    );
+  }
+
+  Widget _summaryCard({
+    required String label,
+    required String value,
+    required String caption,
+    Color? accent,
+  }) {
+    return Expanded(
+      child: _panel(
+        context,
+        accent: accent,
+        padding: const EdgeInsets.fromLTRB(26, 22, 26, 22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.textMuted(context),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+                color: AppTheme.heading(context),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              caption,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textMuted(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------- Pending receipts list ----------
+
+  Widget _pendingBody() {
     if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 80),
-        child: Center(child: CircularProgressIndicator()),
+      return _panel(
+        context,
+        padding: const EdgeInsets.symmetric(vertical: 56),
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -188,30 +387,271 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
       );
     }
 
-    return Column(
-      children: [
-        for (final r in _receipts) ...[
-          _ReceiptCard(
-            receipt: r,
-            expanded: _expandedId == r.paymentId,
-            busy: _actingOn.contains(r.paymentId),
-            onTap: () => setState(() => _expandedId =
-                _expandedId == r.paymentId ? null : r.paymentId),
-            onApprove: () => _approve(r),
-            onReject: () => _reject(r),
-          ),
-          const SizedBox(height: 14),
+    return _panel(
+      context,
+      accent: AppColors.warning,
+      child: _hScroll(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _pendingHeader(),
+            for (final r in _receipts)
+              _ReceiptRow(
+                receipt: r,
+                expanded: _expandedId == r.paymentId,
+                busy: _actingOn.contains(r.paymentId),
+                onTap: () => setState(() =>
+                    _expandedId = _expandedId == r.paymentId ? null : r.paymentId),
+                onApprove: () => _approve(r),
+                onReject: () => _reject(r),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _pendingHeader() {
+    final style = _headerStyle(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      child: Row(
+        children: [
+          Expanded(flex: _Cols.customer, child: Text('CUSTOMER', style: style)),
+          Expanded(flex: _Cols.plan, child: Text('PLAN', style: style)),
+          Expanded(flex: _Cols.method, child: Text('METHOD', style: style)),
+          Expanded(flex: _Cols.submitted, child: Text('SUBMITTED', style: style)),
+          Expanded(flex: _Cols.ocrAmount, child: Text('OCR AMOUNT', style: style)),
+          Expanded(flex: _Cols.ocrRef, child: Text('OCR REFERENCE', style: style)),
+          Expanded(flex: _Cols.type, child: Text('TYPE', style: style)),
+          Expanded(flex: _Cols.check, child: Text('AMOUNT CHECK', style: style)),
+          Expanded(flex: _Cols.action, child: Text('ACTIONS', style: style)),
         ],
-      ],
+      ),
+    );
+  }
+
+  // ---------- Approved payments list ----------
+
+  Widget _approvedBody(List<Map> approved) {
+    if (_loadingApproved && approved.isEmpty) {
+      return _panel(
+        context,
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Center(
+          child: Text('Loading...', style: TextStyle(color: AppTheme.textMuted(context))),
+        ),
+      );
+    }
+
+    if (approved.isEmpty) {
+      return _panel(
+        context,
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Center(
+          child: Text('No approved payments yet',
+              style: TextStyle(color: AppTheme.textMuted(context))),
+        ),
+      );
+    }
+
+    final shown = approved.take(10).toList();
+    final style = _headerStyle(context);
+
+    return _panel(
+      context,
+      child: _hScroll(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              child: Row(
+                children: [
+                  Expanded(flex: 3, child: Text('MEMBER', style: style)),
+                  Expanded(flex: 2, child: Text('PLAN', style: style)),
+                  Expanded(flex: 2, child: Text('AMOUNT', style: style)),
+                  Expanded(flex: 2, child: Text('METHOD', style: style)),
+                  Expanded(flex: 2, child: Text('DATE', style: style)),
+                  Expanded(flex: 2, child: Text('STATUS', style: style)),
+                ],
+              ),
+            ),
+            for (final p in shown) _approvedRow(p),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+              ),
+              child: Text(
+                'Showing ${shown.length} of ${approved.length} payments',
+                style: TextStyle(fontSize: 13, color: AppTheme.textMuted(context)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _approvedRow(Map p) {
+    final amountRaw = (p['amount'] ?? '').toString();
+    final dateRaw = (p['date'] ?? '').toString();
+    final bodyStyle = TextStyle(fontSize: 13, color: AppTheme.heading(context));
+    final mutedStyle = TextStyle(fontSize: 13, color: AppTheme.textMuted(context));
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(
+              (p['member'] ?? '').toString(),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+                color: AppTheme.heading(context),
+              ),
+            ),
+          ),
+          Expanded(flex: 2, child: Text((p['plan'] ?? '').toString(), style: bodyStyle)),
+          Expanded(
+            flex: 2,
+            child: Text(
+              amountRaw.isEmpty ? '—' : _peso(amountRaw),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: AppTheme.heading(context),
+              ),
+            ),
+          ),
+          Expanded(flex: 2, child: Text((p['method'] ?? '').toString(), style: mutedStyle)),
+          Expanded(
+            flex: 2,
+            child: Text(dateRaw.isEmpty ? '—' : _formatDate(dateRaw), style: mutedStyle),
+          ),
+          Expanded(
+            flex: 2,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: _badge('Paid', AppColors.successBg, AppColors.success),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// Receipt card
+// Shared presentation helpers
 // ---------------------------------------------------------------------------
 
-class _ReceiptCard extends StatelessWidget {
+class _Cols {
+  static const int customer = 3;
+  static const int plan = 3;
+  static const int method = 2;
+  static const int submitted = 3;
+  static const int ocrAmount = 2;
+  static const int ocrRef = 3;
+  static const int type = 2;
+  static const int check = 3;
+  static const int action = 3;
+}
+
+TextStyle _sectionTitleStyle(BuildContext context) => TextStyle(
+      fontSize: 17,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.3,
+      color: AppTheme.heading(context),
+    );
+
+TextStyle _headerStyle(BuildContext context) => TextStyle(
+      fontSize: 11.5,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.6,
+      color: AppTheme.textMuted(context),
+    );
+
+/// White rounded card with hairline border + soft shadow. [accent] draws a
+/// thin colored bar on the left edge, reserved for cards needing attention.
+Widget _panel(
+  BuildContext context, {
+  required Widget child,
+  Color? accent,
+  EdgeInsetsGeometry padding = EdgeInsets.zero,
+}) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  return Container(
+    width: double.infinity,
+    clipBehavior: Clip.antiAlias,
+    decoration: BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Theme.of(context).dividerColor),
+      boxShadow: dark
+          ? const []
+          : [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+    ),
+    child: Stack(
+      children: [
+        SizedBox(width: double.infinity, child: Padding(padding: padding, child: child)),
+        if (accent != null)
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 4, color: accent),
+          ),
+      ],
+    ),
+  );
+}
+
+/// Keeps table columns readable on narrow windows by scrolling sideways
+/// instead of squeezing the cells.
+Widget _hScroll(Widget child, {double minWidth = 1100}) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final w = constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(width: w, child: child),
+      );
+    },
+  );
+}
+
+/// Dark solid button (cyan in dark mode), replaces the gold button.
+ButtonStyle _primaryStyle(BuildContext context) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  return ElevatedButton.styleFrom(
+    backgroundColor: dark ? AppColors.cyan : const Color(0xFF111827),
+    foregroundColor: Colors.white,
+    elevation: 0,
+    padding: const EdgeInsets.symmetric(vertical: 14),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+    textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Pending receipt row (table row + expandable receipt detail)
+// ---------------------------------------------------------------------------
+
+class _ReceiptRow extends StatelessWidget {
   final PendingReceipt receipt;
   final bool expanded;
   final bool busy;
@@ -219,7 +659,7 @@ class _ReceiptCard extends StatelessWidget {
   final VoidCallback onApprove;
   final VoidCallback onReject;
 
-  const _ReceiptCard({
+  const _ReceiptRow({
     required this.receipt,
     required this.expanded,
     required this.busy,
@@ -231,103 +671,120 @@ class _ReceiptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final matches = receipt.amountMatches;
+    final heading = AppTheme.heading(context);
+    final muted = AppTheme.textMuted(context);
+
+    final planText = receipt.planName.isEmpty
+        ? '—'
+        : receipt.planPrice.isEmpty
+            ? receipt.planName
+            : '${receipt.planName}  ·  ${_peso(receipt.planPrice)}';
 
     return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: AppTheme.cardDecoration(context, accent: AppColors.cyan),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.card),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              child: Row(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              receipt.memberName.isEmpty
-                                  ? 'Unknown member'
-                                  : receipt.memberName,
-                              style: AppTheme.sectionTitle(context),
-                            ),
-                            if (receipt.memberEmail.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(receipt.memberEmail,
-                                  style: AppTheme.cardSubtitle(context)),
-                            ],
-                          ],
+                  Expanded(
+                    flex: _Cols.customer,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          receipt.memberName.isEmpty ? 'Unknown member' : receipt.memberName,
+                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: heading),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      _badge(
+                        if (receipt.memberEmail.isNotEmpty)
+                          Text(receipt.memberEmail,
+                              style: TextStyle(fontSize: 12, color: muted)),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: _Cols.plan,
+                    child: Text(planText, style: TextStyle(fontSize: 13, color: heading)),
+                  ),
+                  Expanded(
+                    flex: _Cols.method,
+                    child: Text(
+                      receipt.paymentMethod.isEmpty ? '—' : receipt.paymentMethod,
+                      style: TextStyle(fontSize: 13, color: muted),
+                    ),
+                  ),
+                  Expanded(
+                    flex: _Cols.submitted,
+                    child: Text(_formatDate(receipt.dateSubmitted),
+                        style: TextStyle(fontSize: 13, color: muted)),
+                  ),
+                  Expanded(
+                    flex: _Cols.ocrAmount,
+                    child: Text(
+                      receipt.ocrAmount.isEmpty ? '—' : _peso(receipt.ocrAmount),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: heading),
+                    ),
+                  ),
+                  Expanded(
+                    flex: _Cols.ocrRef,
+                    child: Text(
+                      receipt.ocrReference.isEmpty ? '—' : receipt.ocrReference,
+                      style: TextStyle(fontSize: 13, color: muted),
+                    ),
+                  ),
+                  Expanded(
+                    flex: _Cols.type,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: _purposeBadge(receipt.purpose),
+                    ),
+                  ),
+                  Expanded(
+                    flex: _Cols.check,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: _badge(
                         matches ? 'Amount matches' : 'Amount mismatch',
                         matches ? AppColors.successBg : AppColors.dangerBg,
                         matches ? AppColors.success : AppColors.danger,
-                        icon: matches
-                            ? Icons.check_circle_rounded
-                            : Icons.error_rounded,
+                        icon: matches ? Icons.check_circle_rounded : Icons.error_rounded,
                       ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 28,
-                    runSpacing: 14,
-                    children: [
-                      _field(
-                        context,
-                        'Plan',
-                        receipt.planName.isEmpty
-                            ? '—'
-                            : receipt.planPrice.isEmpty
-                                ? receipt.planName
-                                : '${receipt.planName}  ·  ${_peso(receipt.planPrice)}',
-                      ),
-                      _field(
-                        context,
-                        'Method',
-                        receipt.paymentMethod.isEmpty
-                            ? '—'
-                            : receipt.paymentMethod,
-                      ),
-                      _field(context, 'Submitted',
-                          _formatDate(receipt.dateSubmitted)),
-                      _field(
-                        context,
-                        'OCR amount',
-                        receipt.ocrAmount.isEmpty
-                            ? '—'
-                            : _peso(receipt.ocrAmount),
-                      ),
-                      _field(
-                        context,
-                        'OCR reference',
-                        receipt.ocrReference.isEmpty ? '—' : receipt.ocrReference,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text(
-                        expanded ? 'Hide receipt' : 'View receipt',
-                        style: const TextStyle(
-                          color: AppColors.cyanDark,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                  Expanded(
+                    flex: _Cols.action,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: heading.withValues(alpha: 0.35)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              expanded ? 'Hide receipt' : 'View receipt',
+                              style: TextStyle(
+                                color: heading,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            Icon(expanded ? Icons.expand_less : Icons.expand_more,
+                                size: 18, color: heading),
+                          ],
                         ),
                       ),
-                      Icon(expanded ? Icons.expand_less : Icons.expand_more,
-                          size: 18, color: AppColors.cyanDark),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -356,7 +813,7 @@ class _ReceiptCard extends StatelessWidget {
               width: double.infinity,
               constraints: const BoxConstraints(maxHeight: 420),
               alignment: Alignment.center,
-              color: Colors.black.withValues(alpha: 0.04),
+              color: AppTheme.subtleFill(context),
               child: receipt.receiptImageUrl.isEmpty
                   ? _imgPlaceholder(context, 'No receipt image provided')
                   : Image.network(
@@ -393,6 +850,7 @@ class _ReceiptCard extends StatelessWidget {
                       foregroundColor: AppColors.danger,
                       side: const BorderSide(color: AppColors.danger),
                       padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                     ),
                   ),
                 ),
@@ -400,12 +858,9 @@ class _ReceiptCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: onApprove,
-                    icon: const Icon(Icons.check, size: 18, color: AppColors.dark),
-                    label: const Text('Approve',
-                        style: TextStyle(color: AppColors.dark)),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ).merge(AppTheme.goldButtonStyle),
+                    icon: const Icon(Icons.check, size: 18),
+                    label: const Text('Approve'),
+                    style: _primaryStyle(context),
                   ),
                 ),
               ],
@@ -435,10 +890,9 @@ class _MessageState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 24),
-      decoration: AppTheme.cardDecoration(context),
+    return _panel(
+      context,
+      padding: const EdgeInsets.symmetric(vertical: 56, horizontal: 24),
       child: Column(
         children: [
           Icon(icon, size: 40, color: AppTheme.textMuted(context)),
@@ -460,6 +914,28 @@ class _MessageState extends StatelessWidget {
   }
 }
 
+/// Colour-codes the payment's purpose so admin can tell at a glance whether
+/// this is a brand-new member, a renewal, or a plan upgrade -- all of which
+/// land in this same Pending Payments queue.
+Widget _purposeBadge(String purpose) {
+  Color bg;
+  Color fg;
+  switch (purpose) {
+    case 'Renewal':
+      bg = AppColors.cyan.withValues(alpha: 0.15);
+      fg = AppColors.cyanDark;
+      break;
+    case 'Upgrade':
+      bg = const Color(0xFFF3E8FF);
+      fg = const Color(0xFF7C3AED);
+      break;
+    default:
+      bg = AppColors.successBg;
+      fg = AppColors.success;
+  }
+  return _badge(purpose, bg, fg);
+}
+
 Widget _badge(String text, Color bg, Color fg, {IconData? icon}) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -477,33 +953,6 @@ Widget _badge(String text, Color bg, Color fg, {IconData? icon}) {
                 color: fg, fontWeight: FontWeight.w700, fontSize: 11)),
       ],
     ),
-  );
-}
-
-Widget _field(BuildContext context, String label, String value) {
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label.toUpperCase(),
-        style: TextStyle(
-          fontSize: 10.5,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-          color: AppTheme.textMuted(context),
-        ),
-      ),
-      const SizedBox(height: 3),
-      Text(
-        value,
-        style: TextStyle(
-          fontSize: 13.5,
-          fontWeight: FontWeight.w600,
-          color: AppTheme.heading(context),
-        ),
-      ),
-    ],
   );
 }
 

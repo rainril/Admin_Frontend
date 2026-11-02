@@ -31,7 +31,6 @@ Future<bool> showRecordSaleDialog(
 
   const methods = ['Cash', 'GCash', 'Maya', 'Bank Transfer'];
   const accent = AppColors.cyan;
-  const mutedText = AppColors.textMuted;
 
   final result = await showDialog<bool>(
     context: context,
@@ -57,21 +56,21 @@ Future<bool> showRecordSaleDialog(
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       IconButton(
                         onPressed: () => Navigator.pop(context, false),
-                        icon: const Icon(Icons.close, size: 20, color: mutedText),
+                        icon: Icon(Icons.close, size: 20, color: AppTheme.textMuted(context)),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(itemName, style: const TextStyle(fontSize: 13, color: mutedText)),
+                  Text(itemName, style: TextStyle(fontSize: 13, color: AppTheme.textMuted(context))),
                   const SizedBox(height: 4),
                   Text(
                     outOfStock ? 'Out of stock' : '$stock in stock · ₱${price.toStringAsFixed(0)} each',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: outOfStock ? AppColors.danger : mutedText,
+                      color: outOfStock ? AppColors.danger : AppTheme.textMuted(context),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -112,7 +111,7 @@ Future<bool> showRecordSaleDialog(
                     controller: buyerController,
                     decoration: InputDecoration(
                       hintText: 'e.g. Juan Dela Cruz — leave blank for Walk-in',
-                      hintStyle: const TextStyle(fontSize: 12, color: mutedText),
+                      hintStyle: TextStyle(fontSize: 12, color: AppTheme.textMuted(context)),
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       border: OutlineInputBorder(
@@ -175,9 +174,9 @@ Future<bool> showRecordSaleDialog(
                   ],
 
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     "This will be saved as Pending — stock won't change until you confirm it.",
-                    style: TextStyle(fontSize: 11, color: mutedText, fontStyle: FontStyle.italic),
+                    style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context), fontStyle: FontStyle.italic),
                   ),
                   const SizedBox(height: 16),
 

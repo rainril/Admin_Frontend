@@ -25,6 +25,9 @@ class _QrScannerPageState extends State<QrScannerPage> {
   // Camera preview size — just big enough for a QR code to fit comfortably.
   static const double scanBoxSize = 260;
 
+  // Same near-black navy as the sidebar rail, so the scanner matches the app.
+  static const Color _rail = Color(0xFF111827);
+
   final MobileScannerController _controller = MobileScannerController();
   bool _isProcessing = false;
 
@@ -49,26 +52,46 @@ class _QrScannerPageState extends State<QrScannerPage> {
     if (mounted) Navigator.of(context).pop(value);
   }
 
+  /// Round, softly tinted icon button used for the flash / camera actions.
+  ButtonStyle get _actionStyle => IconButton.styleFrom(
+        backgroundColor: Colors.white.withValues(alpha: 0.08),
+        foregroundColor: Colors.white,
+        shape: const CircleBorder(),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: _rail,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: _rail,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text('Scan Member QR ID'),
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        title: const Text(
+          'Scan Member QR ID',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+          ),
+        ),
         actions: [
           IconButton(
             tooltip: 'Toggle flash',
+            style: _actionStyle,
             onPressed: () => _controller.toggleTorch(),
-            icon: const Icon(Icons.flash_on_outlined),
+            icon: const Icon(Icons.flash_on_outlined, size: 20),
           ),
+          const SizedBox(width: 8),
           IconButton(
             tooltip: 'Switch camera',
+            style: _actionStyle,
             onPressed: () => _controller.switchCamera(),
-            icon: const Icon(Icons.flip_camera_ios_outlined),
+            icon: const Icon(Icons.flip_camera_ios_outlined, size: 20),
           ),
+          const SizedBox(width: 16),
         ],
       ),
       body: Container(
@@ -80,20 +103,37 @@ class _QrScannerPageState extends State<QrScannerPage> {
           //   image: AssetImage('assets/scanner_background.png'),
           //   fit: BoxFit.cover,
           // ),
-          color: Color(0xFF0F172A), // placeholder background color
+          color: _rail,
         ),
         child: Center(
-          child: _buildCameraBox(),
+          child: _buildScannerPanel(),
         ),
       ),
       bottomNavigationBar: const Padding(
         padding: EdgeInsets.only(bottom: 24, top: 8),
         child: Text(
           'Point the camera at a member\'s QR ID',
-           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white70, fontSize: 14),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color(0xA6FFFFFF),
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
+    );
+  }
+
+  /// Soft dark panel around the camera box (card-like, hairline border).
+  Widget _buildScannerPanel() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: _buildCameraBox(),
     );
   }
 
@@ -112,7 +152,7 @@ class _QrScannerPageState extends State<QrScannerPage> {
               errorBuilder: (context, error, _) { // Changed 'child' to '_' as it's unused
                 return Center(
                   child: Text(
-                     'Error: ${error.toString()}\nPlease grant camera permission.',
+                    'Error: ${error.toString()}\nPlease grant camera permission.',
                     style: const TextStyle(color: Colors.white),
                   ),
                 );
@@ -122,7 +162,7 @@ class _QrScannerPageState extends State<QrScannerPage> {
           IgnorePointer(
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.cyan, width: 3),
+                border: Border.all(color: AppColors.cyan, width: 2),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),

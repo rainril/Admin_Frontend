@@ -3,7 +3,6 @@ import '../theme/app_theme.dart';
 import '../services/current_user.dart';
 import '../services/settings_service.dart';
 import '../services/theme_controller.dart';
-import '../widgets/page_header_banner.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -42,7 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadSettings();
   }
 
-    Future<void> _loadSettings() async {
+  Future<void> _loadSettings() async {
     final accountId = CurrentUser.accountId;
     if (accountId == null) {
       setState(() => _loadingSettings = false);
@@ -83,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-    Future<void> _onToggleDarkMode(bool value) async {
+  Future<void> _onToggleDarkMode(bool value) async {
     setState(() => _darkMode = value);
     ThemeController.instance.setDarkMode(value); // agad na mag-a-apply
     final accountId = CurrentUser.accountId;
@@ -139,6 +138,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  // ---------------------------------------------------------------------
+  // Presentation helpers (styling only, no logic)
+  // ---------------------------------------------------------------------
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  /// Dark solid button (cyan in dark mode), replaces the gold button.
+  ButtonStyle _primaryButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: _isDark ? AppColors.cyan : const Color(0xFF111827),
+      foregroundColor: Colors.white,
+      elevation: 0,
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    );
+  }
+
+  /// Plain bordered field (no tinted fill), cyan border when focused.
+  InputDecoration _inputDecoration({Widget? suffixIcon}) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: Theme.of(context).dividerColor),
+    );
+    return InputDecoration(
+      isDense: true,
+      filled: false,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      border: border,
+      enabledBorder: border,
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.cyan),
+      ),
+      suffixIcon: suffixIcon,
+    );
+  }
+
+  TextStyle get _labelStyle => TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 13,
+        color: AppTheme.heading(context),
+      );
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -148,7 +191,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _card(
-            accent: AppColors.cyan,
             title: 'Admin Profile',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -177,11 +219,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => _snack('Profile changes saved'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ).merge(AppTheme.goldButtonStyle),
-                    child: const Text('Save Changes', style: TextStyle(fontWeight: FontWeight.w600)),
+                    style: _primaryButtonStyle(),
+                    child: const Text('Save Changes'),
                   ),
                 ),
               ],
@@ -189,7 +228,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: AppSpacing.section),
           _card(
-            accent: AppColors.gold,
             title: 'Account Settings',
             child: _loadingSettings
                 ? const Padding(
@@ -199,8 +237,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Change Password',
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('Change Password',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: AppTheme.heading(context),
+                          )),
                       const SizedBox(height: 12),
                       _passwordField('Current Password', _currentPasswordController, _obscureCurrent,
                           () => setState(() => _obscureCurrent = !_obscureCurrent)),
@@ -215,22 +257,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _changingPassword ? null : _onChangePassword,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.dark,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
+                          style: _primaryButtonStyle(),
                           child: _changingPassword
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                 )
-                              : const Text('Update Password', style: TextStyle(fontWeight: FontWeight.w600)),
+                              : const Text('Update Password'),
                         ),
                       ),
-                      const Divider(height: 32),
+                      Divider(height: 32, color: Theme.of(context).dividerColor),
                       _toggleRow('Enable notifications', _notificationsEnabled, _onToggleNotifications),
                       _toggleRow('Dark mode', _darkMode, _onToggleDarkMode),
                     ],
@@ -243,7 +280,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _card(
-            accent: AppColors.cyan,
             title: 'Gym Information',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,12 +294,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => _snack('Gym information updated'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ).merge(AppTheme.goldButtonStyle),
-                    child: const Text('Update Info',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    style: _primaryButtonStyle(),
+                    child: const Text('Update Info'),
                   ),
                 ),
               ],
@@ -297,24 +329,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
+  /// Plain page title (replaces the big cyan banner).
   Widget _header() {
-    return const PageHeaderBanner(
-      eyebrow: 'Settings',
-      icon: Icons.settings_outlined,
-      title: 'Settings',
-      subtitle: 'Manage system configuration and preferences',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Settings',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+            color: AppTheme.heading(context),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Manage system configuration and preferences',
+          style: TextStyle(fontSize: 14, color: AppTheme.textMuted(context)),
+        ),
+      ],
     );
   }
 
-  Widget _card({required String title, required Widget child, Color? accent}) {
+  /// White rounded card with hairline border + soft shadow.
+  Widget _card({required String title, required Widget child}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: AppTheme.cardDecoration(context, accent: accent),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).dividerColor),
+        boxShadow: _isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTheme.sectionTitle(context)),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+              color: AppTheme.heading(context),
+            ),
+          ),
           const SizedBox(height: 18),
           child,
         ],
@@ -326,9 +394,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        Text(label, style: _labelStyle),
         const SizedBox(height: 8),
-        TextFormField(controller: controller),
+        TextFormField(controller: controller, decoration: _inputDecoration()),
       ],
     );
   }
@@ -342,14 +410,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        Text(label, style: _labelStyle),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: obscure,
-          decoration: InputDecoration(
+          decoration: _inputDecoration(
             suffixIcon: IconButton(
-              icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: AppColors.cyan),
+              icon: Icon(
+                obscure ? Icons.visibility_off : Icons.visibility,
+                size: 20,
+                color: AppTheme.textMuted(context),
+              ),
               onPressed: onToggle,
             ),
           ),
@@ -364,7 +436,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(child: Text(label)),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.heading(context),
+              ),
+            ),
+          ),
           Switch(
             value: value,
             activeThumbColor: Colors.white,

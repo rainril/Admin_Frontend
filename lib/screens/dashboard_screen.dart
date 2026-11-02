@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../theme/app_theme.dart';
-import '../widgets/stat_card.dart';
 import '../widgets/tab_visibility.dart';
 import '../services/current_user.dart';
 import '../services/payment_data.dart';
 import '../services/attendance_data.dart';
 import '../widgets/ai_insight_card.dart';
 import '../widgets/state_views.dart';
-import '../widgets/page_header_banner.dart';
 import '../services/dashboard_stats_service.dart';
 import '../services/dashboard_analytics_service.dart';
 
@@ -38,6 +36,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   ChartSeries? _attendanceSeries;
   bool _loadingAttendance = true;
+
+  ChartSeries? _monthlyAttendanceSeries;
+  bool _loadingMonthlyAttendance = true;
 
   List<ExpiringMember> _expiringMembers = [];
   bool _loadingExpiring = true;
@@ -70,6 +71,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _loadChurnForecast();
     _loadRevenueAnalytics();
     _loadAttendanceAnalytics();
+    _loadMonthlyAttendanceAnalytics();
     _loadExpiringMemberships();
     _loadRecentNotifications();
     _loadTodaysWalkIns();
@@ -84,6 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _loadChurnRisk(silent: true);
     _loadRevenueAnalytics(silent: true);
     _loadAttendanceAnalytics(silent: true);
+    _loadMonthlyAttendanceAnalytics(silent: true);
     _loadExpiringMemberships(silent: true);
     _loadRecentNotifications(silent: true);
     _loadTodaysWalkIns(silent: true);
@@ -137,6 +140,17 @@ class _DashboardScreenState extends State<DashboardScreen>
       setState(() {
         _attendanceSeries = series;
         _loadingAttendance = false;
+      });
+    }
+  }
+
+  Future<void> _loadMonthlyAttendanceAnalytics({bool silent = false}) async {
+    if (!silent) setState(() => _loadingMonthlyAttendance = true);
+    final series = await DashboardAnalyticsService.fetchAttendanceAnalytics('monthly');
+    if (mounted) {
+      setState(() {
+        _monthlyAttendanceSeries = series;
+        _loadingMonthlyAttendance = false;
       });
     }
   }
@@ -238,12 +252,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const PageHeaderBanner(
-              eyebrow: 'Dashboard',
-              icon: Icons.grid_view_rounded,
-              title: 'Welcome back!',
-              subtitle: "Here's what's happening with your gym today.",
-            ),
+            _pageHeader(),
             const SizedBox(height: AppSpacing.section),
             GridView.count(
               crossAxisCount: statCols,
@@ -251,9 +260,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
-              childAspectRatio: statCols == 1 ? 2.8 : 1.5,
+              childAspectRatio: statCols == 1 ? 2.8 : 2.0,
               children: isOwner ? _ownerStatCards() : _staffStatCards(),
-
             ),
             const SizedBox(height: AppSpacing.section),
 
@@ -263,6 +271,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               _revenueAnalyticsCard(),
               const SizedBox(height: AppSpacing.section),
               _attendanceAnalyticsCard(),
+              const SizedBox(height: AppSpacing.section),
+              _monthlyAttendanceCard(),
               const SizedBox(height: AppSpacing.section),
               _expiringMembershipsCard(),
               const SizedBox(height: AppSpacing.section),
@@ -287,6 +297,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               const SizedBox(height: AppSpacing.section),
             ] else ...[
               _weeklyAttendanceCard(),
+              const SizedBox(height: AppSpacing.section),
+              _monthlyAttendanceCard(),
               const SizedBox(height: AppSpacing.section),
               _expiringMembershipsCard(),
               const SizedBox(height: AppSpacing.section),
@@ -354,6 +366,48 @@ class _DashboardScreenState extends State<DashboardScreen>
     });
   }
 
+  // ---------- Page header (replaces the big cyan welcome banner) ----------
+
+  Widget _pageHeader() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Dashboard',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              color: AppTheme.heading(context),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Here's what's happening with your gym today.",
+            style: TextStyle(fontSize: 14, color: AppTheme.textMuted(context)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------- Small shared style helpers ----------
+
+  /// Small uppercase gray card title (Haws Prints style).
+  Widget _panelTitle(String text) {
+    return Text(
+      text.toUpperCase(),
+      style: TextStyle(
+        fontSize: 12.5,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 1.1,
+        color: AppTheme.textMuted(context),
+      ),
+    );
+  }
+
   // ---------- Stat cards ----------
 
   List<Widget> _ownerStatCards() {
@@ -365,37 +419,30 @@ class _DashboardScreenState extends State<DashboardScreen>
         : (_loadingChurnRisk ? '—' : 'Watch');
 
     return [
-      StatCard(
+      _KpiCard(
         icon: Icons.card_membership_outlined,
-        iconBg: AppColors.blueBg,
-        iconColor: AppColors.blueIcon,
         change: '+12%',
         value: stats != null ? '${stats.activeSubscriptions}' : '—',
         label: 'Active Subscriptions',
       ),
-      StatCard(
+      _KpiCard(
         icon: Icons.person_outline,
-        iconBg: AppColors.tealBg,
-        iconColor: AppColors.tealIcon,
         change: '+8%',
         value: stats != null ? '${stats.activeMembers}' : '—',
         label: 'Active Members',
       ),
-      StatCard(
+      _KpiCard(
         iconText: '₱',
-        iconBg: AppColors.goldBg,
-        iconColor: AppColors.gold,
         change: '+15%',
         value: _formatCurrency(totalRevenue),
         label: 'Total Revenue (This Year)',
       ),
-      StatCard(
+      _KpiCard(
         icon: Icons.warning_amber_rounded,
-        iconBg: const Color(0xFFFEE2E2),
-        iconColor: const Color(0xFFDC2626),
         change: churnChange,
         value: _loadingChurnRisk ? '—' : '$churnCount',
         label: 'Churn Risk (Active Members)',
+        accent: AppColors.warning,
       ),
     ];
   }
@@ -403,26 +450,20 @@ class _DashboardScreenState extends State<DashboardScreen>
   List<Widget> _staffStatCards() {
     final stats = _dashboardStats;
     return [
-      StatCard(
+      _KpiCard(
         icon: Icons.people_alt_outlined,
-        iconBg: AppColors.blueBg,
-        iconColor: AppColors.blueIcon,
         change: '+12%',
         value: stats != null ? '${stats.activeSubscriptions}' : '—',
         label: 'Members on Plan',
       ),
-      StatCard(
+      _KpiCard(
         icon: Icons.person_outline,
-        iconBg: AppColors.tealBg,
-        iconColor: AppColors.tealIcon,
         change: '+8%',
         value: stats != null ? '${stats.activeMembers}' : '—',
         label: 'Active Members',
       ),
-      StatCard(
+      _KpiCard(
         icon: Icons.trending_up,
-        iconBg: AppColors.greenBg,
-        iconColor: AppColors.greenIcon,
         change: '+5%',
         value: stats != null ? '${stats.attendanceRate}%' : '—',
         label: "Today's Attendance Rate",
@@ -440,9 +481,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     double chartHeight = 240,
     Color? accent,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: AppTheme.cardDecoration(context, accent: accent),
+    return _Panel(
+      accent: accent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -453,9 +493,9 @@ class _DashboardScreenState extends State<DashboardScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: AppTheme.sectionTitle(context)),
+                  _panelTitle(title),
                   if (subtitle != null) ...[
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 4),
                     Text(subtitle, style: AppTheme.cardSubtitle(context)),
                   ],
                 ],
@@ -470,21 +510,85 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  /// Small neutral tag (e.g. "AI Predicted", "Live").
   Widget _aiBadge({String label = 'AI Predicted'}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.goldBg,
+        color: AppTheme.subtleFill(context),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.auto_awesome, size: 12, color: AppColors.gold),
+          const Icon(Icons.auto_awesome, size: 12, color: AppColors.cyan),
           const SizedBox(width: 4),
           Text(label,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.gold)),
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textMuted(context))),
         ],
+      ),
+    );
+  }
+
+  // ---------- Shared bar chart (weekly / monthly attendance) ----------
+
+  Widget _attendanceBarChart({
+    required List<String> labels,
+    required List<double> values,
+    required double maxY,
+    required double interval,
+  }) {
+    return BarChart(
+      BarChartData(
+        maxY: maxY,
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          horizontalInterval: interval,
+          getDrawingHorizontalLine: (v) =>
+              FlLine(color: Theme.of(context).dividerColor, strokeWidth: 1),
+        ),
+        borderData: FlBorderData(show: false),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: interval,
+              reservedSize: 36,
+              getTitlesWidget: (v, meta) => Text(v.toInt().toString(),
+                  style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context))),
+            ),
+          ),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (v, meta) {
+                final i = v.toInt();
+                if (i < 0 || i >= labels.length) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(labels[i],
+                      style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context))),
+                );
+              },
+            ),
+          ),
+        ),
+        barGroups: List.generate(values.length, (i) {
+          return BarChartGroupData(x: i, barRods: [
+            BarChartRodData(
+              toY: values[i],
+              color: AppColors.cyan,
+              width: 18,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
+            ),
+          ]);
+        }),
       ),
     );
   }
@@ -503,7 +607,6 @@ class _DashboardScreenState extends State<DashboardScreen>
       subtitle: 'Actual revenue from membership and walk-in payments',
       trailing: _aiBadge(),
       chartHeight: 260,
-      accent: AppColors.gold,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -535,7 +638,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 interval: interval,
                                 reservedSize: 56,
                                 getTitlesWidget: (v, meta) => Text(_formatChartValue(v),
-                                    style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                                    style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context))),
                               ),
                             ),
                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -549,7 +652,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: Text(labels[i],
-                                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                                        style: TextStyle(fontSize: 11, color: AppTheme.textMuted(context))),
                                   );
                                 },
                               ),
@@ -561,7 +664,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   values.length, (i) => FlSpot(i.toDouble(), values[i])),
                               isCurved: true,
                               curveSmoothness: 0.28,
-                              color: AppColors.gold,
+                              color: AppColors.cyan,
                               barWidth: 3,
                               dotData: FlDotData(
                                 show: true,
@@ -570,7 +673,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         radius: 3.5,
                                         color: Theme.of(context).cardColor,
                                         strokeWidth: 2.5,
-                                        strokeColor: AppColors.gold),
+                                        strokeColor: AppColors.cyan),
                               ),
                               belowBarData: BarAreaData(
                                 show: true,
@@ -578,8 +681,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    AppColors.gold.withValues(alpha: 0.18),
-                                    AppColors.gold.withValues(alpha: 0.0),
+                                    AppColors.cyan.withValues(alpha: 0.16),
+                                    AppColors.cyan.withValues(alpha: 0.0),
                                   ],
                                 ),
                               ),
@@ -593,13 +696,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  /// Weekly / Monthly / Yearly toggle, styled as a dark pill like the
+  /// Haws Prints period switcher. Behavior is unchanged.
   Widget _periodSelector() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedBg = isDark ? AppColors.cyan : const Color(0xFF111827);
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2A2E35) : const Color(0xFFF1F3F5),
-        borderRadius: BorderRadius.circular(AppRadius.control),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
@@ -609,29 +715,24 @@ class _DashboardScreenState extends State<DashboardScreen>
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: InkWell(
-              borderRadius: BorderRadius.circular(7),
+              borderRadius: BorderRadius.circular(999),
               onTap: () {
                 setState(() => _revenuePeriod = p);
                 _loadRevenueAnalytics();
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? (isDark ? const Color(0xFF3A3F47) : Colors.white)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(7),
-                  boxShadow: selected
-                      ? [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 5, offset: const Offset(0, 1))]
-                      : null,
+                  color: selected ? selectedBg : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   _periodLabel(p),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: selected ? AppColors.cyanDark : AppColors.textMuted,
+                    color: selected ? Colors.white : AppTheme.textMuted(context),
                   ),
                 ),
               ),
@@ -673,75 +774,44 @@ class _DashboardScreenState extends State<DashboardScreen>
       title: 'Attendance Analytics',
       subtitle: "This week's actual foot traffic (member check-ins + walk-ins)",
       trailing: _aiBadge(label: 'Live'),
-      accent: AppColors.cyan,
       child: _loadingAttendance
           ? const LoadingState()
           : values.isEmpty
               ? const EmptyState(
                   icon: Icons.bar_chart,
                   message: 'No attendance recorded yet this week.')
-              : BarChart(
-                  BarChartData(
-                    maxY: maxY,
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: interval,
-                      getDrawingHorizontalLine: (v) =>
-                          FlLine(color: Theme.of(context).dividerColor, strokeWidth: 1),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: interval,
-                          reservedSize: 36,
-                          getTitlesWidget: (v, meta) => Text(v.toInt().toString(),
-                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
-                        ),
-                      ),
-                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (v, meta) {
-                            final i = v.toInt();
-                            if (i < 0 || i >= labels.length) return const SizedBox.shrink();
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(labels[i],
-                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    barGroups: List.generate(values.length, (i) {
-                      return BarChartGroupData(x: i, barRods: [
-                        BarChartRodData(
-                          toY: values[i],
-                          gradient: const LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [AppColors.cyanDark, AppColors.cyan],
-                          ),
-                          width: 20,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-                        ),
-                      ]);
-                    }),
-                  ),
-                ),
+              : _attendanceBarChart(
+                  labels: labels, values: values, maxY: maxY, interval: interval),
+    );
+  }
+
+  // ---------- Monthly Attendance Analytics (owner + staff) ----------
+  Widget _monthlyAttendanceCard() {
+    final series = _monthlyAttendanceSeries;
+    final labels = series?.labels ?? const ['', '', '', '', '', ''];
+    final values = series?.values ?? const <double>[];
+    final maxRaw = values.isEmpty ? 0.0 : values.reduce((a, b) => a > b ? a : b);
+    final maxY = maxRaw > 0 ? maxRaw * 1.2 : 10.0;
+    final interval = maxY / 4;
+
+    return _cardWrap(
+      title: 'Monthly Attendance',
+      subtitle: 'Foot traffic (member check-ins + walk-ins) over the last 6 months',
+      trailing: _aiBadge(label: 'Live'),
+      child: _loadingMonthlyAttendance
+          ? const LoadingState()
+          : values.isEmpty
+              ? const EmptyState(
+                  icon: Icons.bar_chart,
+                  message: 'No attendance recorded yet this month.')
+              : _attendanceBarChart(
+                  labels: labels, values: values, maxY: maxY, interval: interval),
     );
   }
 
   // ---------- Owner: Expiring Memberships ----------
   Widget _expiringMembershipsCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: AppTheme.cardDecoration(context, accent: AppColors.cyan),
+    return _Panel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -752,16 +822,16 @@ class _DashboardScreenState extends State<DashboardScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Expiring Memberships', style: AppTheme.sectionTitle(context)),
-                  const SizedBox(height: 3),
+                  _panelTitle('Expiring Memberships'),
+                  const SizedBox(height: 4),
                   Text('Members renewing within the next 7 days',
                       style: AppTheme.cardSubtitle(context)),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDDF7FC),
+                  color: AppColors.cyan.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -799,10 +869,10 @@ class _DashboardScreenState extends State<DashboardScreen>
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 16,
-            backgroundColor: Color(0xFFF1F5F9),
-            child: Icon(Icons.person_outline, size: 16, color: AppColors.textMuted),
+            backgroundColor: AppTheme.subtleFill(context),
+            child: Icon(Icons.person_outline, size: 16, color: AppTheme.textMuted(context)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -812,7 +882,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 Text(m.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 Text(
                   '${m.plan ?? 'No plan'} · ${m.renewalCount} previous renewal${m.renewalCount == 1 ? '' : 's'}',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context)),
                 ),
               ],
             ),
@@ -830,9 +900,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // ---------- Owner: Churn Risk Watchlist ----------
   Widget _churnRiskCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: AppTheme.cardDecoration(context, accent: AppColors.warning),
+    return _Panel(
+      accent: AppColors.warning,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -843,20 +912,20 @@ class _DashboardScreenState extends State<DashboardScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Churn Risk Watchlist', style: AppTheme.sectionTitle(context)),
-                  const SizedBox(height: 3),
+                  _panelTitle('Churn Risk Watchlist'),
+                  const SizedBox(height: 4),
                   Text('Active members flagged for possible churn',
                       style: AppTheme.cardSubtitle(context)),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppTheme.subtleFill(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text('Rule-based · prototype',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                child: Text('Rule-based · prototype',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMuted(context))),
               ),
             ],
           ),
@@ -883,10 +952,10 @@ class _DashboardScreenState extends State<DashboardScreen>
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 16,
-            backgroundColor: Color(0xFFF1F5F9),
-            child: Icon(Icons.person_outline, size: 16, color: AppColors.textMuted),
+            backgroundColor: AppTheme.subtleFill(context),
+            child: Icon(Icons.person_outline, size: 16, color: AppTheme.textMuted(context)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -894,7 +963,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(m.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                Text(m.reason, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                Text(m.reason, style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context))),
               ],
             ),
           ),
@@ -911,9 +980,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // ---------- Owner: AI Churn Forecast (prototype) ----------
   Widget _aiChurnForecastCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: AppTheme.cardDecoration(context, accent: AppColors.warning),
+    return _Panel(
+      accent: AppColors.warning,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -921,7 +989,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('AI Churn Forecast', style: AppTheme.sectionTitle(context)),
+              _panelTitle('AI Churn Forecast'),
               _aiBadge(label: 'AI Predicted · Prototype'),
             ],
           ),
@@ -929,18 +997,18 @@ class _DashboardScreenState extends State<DashboardScreen>
           if (_loadingChurnForecast)
             const LoadingState()
           else if (_churnForecast == null)
-            const Text('Forecast unavailable right now.',
-                style: TextStyle(color: AppColors.textMuted))
+            Text('Forecast unavailable right now.',
+                style: TextStyle(color: AppTheme.textMuted(context)))
           else ...[
             Row(
               children: [
                 Text('${_churnForecast!.riskRatePercent}%',
-                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.gold)),
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.warning)),
                 const SizedBox(width: 8),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 8),
                   child: Text('of active members at risk',
-                      style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                      style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context))),
                 ),
               ],
             ),
@@ -983,66 +1051,14 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     return _cardWrap(
       title: 'Weekly Attendance',
-      accent: AppColors.cyan,
       child: _loadingAttendance
           ? const LoadingState()
           : values.isEmpty
               ? const EmptyState(
                   icon: Icons.bar_chart,
                   message: 'No attendance recorded yet this week.')
-              : BarChart(
-                  BarChartData(
-                    maxY: maxY,
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: interval,
-                      getDrawingHorizontalLine: (v) =>
-                          FlLine(color: Theme.of(context).dividerColor, strokeWidth: 1),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: interval,
-                          reservedSize: 36,
-                          getTitlesWidget: (v, meta) => Text(v.toInt().toString(),
-                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
-                        ),
-                      ),
-                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (v, meta) {
-                            final i = v.toInt();
-                            if (i < 0 || i >= labels.length) return const SizedBox.shrink();
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(labels[i], style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    barGroups: List.generate(values.length, (i) {
-                      return BarChartGroupData(x: i, barRods: [
-                        BarChartRodData(
-                          toY: values[i],
-                          gradient: const LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [AppColors.cyanDark, AppColors.cyan],
-                          ),
-                          width: 20,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-                        ),
-                      ]);
-                    }),
-                  ),
-                ),
+              : _attendanceBarChart(
+                  labels: labels, values: values, maxY: maxY, interval: interval),
     );
   }
 
@@ -1073,14 +1089,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     required List<Map<String, String>> entries,
     bool loading = false,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: AppTheme.cardDecoration(context, accent: AppColors.cyan),
+    return _Panel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title, style: AppTheme.sectionTitle(context)),
+          _panelTitle(title),
           const SizedBox(height: 16),
           if (loading)
             const LoadingState(padding: EdgeInsets.symmetric(vertical: 20))
@@ -1095,10 +1109,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 16,
-                      backgroundColor: Color(0xFFE0F7FA),
-                      child: Icon(Icons.person, size: 16, color: AppColors.cyanDark),
+                      backgroundColor: AppTheme.subtleFill(context),
+                      child: Icon(Icons.person, size: 16, color: AppTheme.textMuted(context)),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1108,13 +1122,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                           Text(e['name'] ?? '',
                               style: const TextStyle(fontWeight: FontWeight.w600)),
                           Text(e['plan'] ?? e['amount'] ?? '',
-                              style: const TextStyle(
-                                  fontSize: 12, color: AppColors.textMuted)),
+                              style: TextStyle(
+                                  fontSize: 12, color: AppTheme.textMuted(context))),
                         ],
                       ),
                     ),
                     Text(e['time'] ?? '',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                        style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context))),
                   ],
                 ),
               ),
@@ -1124,14 +1138,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _notificationsCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: AppTheme.cardDecoration(context),
+    return _Panel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Recent Notifications', style: AppTheme.sectionTitle(context)),
+          _panelTitle('Recent Notifications'),
           const SizedBox(height: 14),
           if (_loadingNotifications)
             const LoadingState(padding: EdgeInsets.symmetric(vertical: 16))
@@ -1170,7 +1181,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         break;
       default:
         icon = Icons.notifications_none;
-        iconColor = AppColors.textMuted;
+        iconColor = AppTheme.textMuted(context);
     }
 
     return Padding(
@@ -1185,12 +1196,165 @@ class _DashboardScreenState extends State<DashboardScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(n.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text(n.subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                Text(n.subtitle, style: TextStyle(color: AppTheme.textMuted(context), fontSize: 13)),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          Text(n.timeAgo, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+          Text(n.timeAgo, style: TextStyle(color: AppTheme.textMuted(context), fontSize: 11)),
+        ],
+      ),
+    );
+  }
+}
+
+// =====================================================================
+// Presentation-only widgets used by the dashboard (no logic).
+// =====================================================================
+
+/// White rounded card with a hairline border and soft shadow. An optional
+/// [accent] draws a thin colored bar on the left edge, reserved for cards
+/// that need attention (e.g. churn risk).
+class _Panel extends StatelessWidget {
+  final Widget child;
+  final Color? accent;
+  final EdgeInsetsGeometry? padding;
+
+  const _Panel({required this.child, this.accent, this.padding});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).dividerColor),
+        boxShadow: dark
+            ? const []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: padding ?? const EdgeInsets.all(AppSpacing.card),
+            child: child,
+          ),
+          if (accent != null)
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(width: 4, color: accent),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// KPI card: small gray label on top, big bold number, small status text
+/// underneath. Replaces the tinted/colored StatCard on this screen.
+class _KpiCard extends StatelessWidget {
+  final IconData? icon;
+  final String? iconText;
+  final String change;
+  final String value;
+  final String label;
+  final Color? accent;
+
+  const _KpiCard({
+    this.icon,
+    this.iconText,
+    required this.change,
+    required this.value,
+    required this.label,
+    this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final muted = AppTheme.textMuted(context);
+    final tint = accent ?? AppColors.cyan;
+    final positive = change.startsWith('+');
+    final changeColor = positive ? AppColors.greenIcon : (accent ?? muted);
+
+    return _Panel(
+      accent: accent,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: muted,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: tint.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: iconText != null
+                    ? Text(
+                        iconText!,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: tint,
+                        ),
+                      )
+                    : Icon(icon, size: 17, color: tint),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+                color: AppTheme.heading(context),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            change,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: changeColor,
+            ),
+          ),
         ],
       ),
     );

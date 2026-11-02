@@ -22,7 +22,6 @@ class MerchSalesPanel extends StatefulWidget {
 
 class MerchSalesPanelState extends State<MerchSalesPanel> {
   static const Color accent = AppColors.cyan;
-  static const Color mutedText = AppColors.textMuted;
 
   List<MerchSale> _pending = [];
   List<MerchSale> _recent = [];
@@ -146,7 +145,7 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
                 ),
                 IconButton(
                   onPressed: refresh,
-                  icon: const Icon(Icons.refresh, size: 20, color: mutedText),
+                  icon: Icon(Icons.refresh, size: 20, color: AppTheme.textMuted(context)),
                   tooltip: 'Refresh',
                 ),
               ],
@@ -159,10 +158,10 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
               child: Center(child: CircularProgressIndicator()),
             )
           else if (_pending.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 32),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
               child: Center(
-                child: Text('No pending sales awaiting confirmation.', style: TextStyle(color: mutedText)),
+                child: Text('No pending sales awaiting confirmation.', style: TextStyle(color: AppTheme.textMuted(context))),
               ),
             )
           else
@@ -187,7 +186,7 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
               children: [
                 Text(sale.itemName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 Text('${sale.buyerName} · ${sale.paymentMethod}',
-                    style: const TextStyle(fontSize: 12, color: mutedText)),
+                    style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context))),
               ],
             ),
           ),
@@ -255,9 +254,9 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
               child: Center(child: CircularProgressIndicator()),
             )
           else if (_recent.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 32),
-              child: Center(child: Text('No confirmed sales yet.', style: TextStyle(color: mutedText))),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Center(child: Text('No confirmed sales yet.', style: TextStyle(color: AppTheme.textMuted(context)))),
             )
           else
             for (final sale in _recent) _recentRow(sale),
@@ -276,14 +275,14 @@ class MerchSalesPanelState extends State<MerchSalesPanel> {
             flex: 3,
             child: Text(sale.itemName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
           ),
-          Expanded(flex: 2, child: Text(sale.buyerName, style: const TextStyle(fontSize: 12, color: mutedText))),
+          Expanded(flex: 2, child: Text(sale.buyerName, style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context)))),
           Expanded(flex: 1, child: Text('× ${sale.quantity}', style: const TextStyle(fontSize: 12))),
           Expanded(
             flex: 2,
             child: Text('₱${sale.totalAmount.toStringAsFixed(0)}',
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
           ),
-          Expanded(flex: 2, child: Text(sale.date, style: const TextStyle(fontSize: 12, color: mutedText))),
+          Expanded(flex: 2, child: Text(sale.date, style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context)))),
         ],
       ),
     );

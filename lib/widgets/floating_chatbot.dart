@@ -6,6 +6,22 @@ import '../services/chatbot_history_service.dart';
 
 const double _historySidebarBreakpoint = 760;
 
+/// Chat panel colors, matched to the staff login page and the PrimeFit
+/// Support widget on the landing page: a near-black panel with gold + cyan
+/// accents, in both light and dark mode.
+class _ChatColors {
+  static const Color panelBg = Color(0xFF0A0A0A);
+  static const Color panelBorder = Color(0xFF26262B);
+  static const Color divider = Color(0xFF1F1F23);
+  static const Color bubbleOther = Color(0xFF1A1A1D);
+  static const Color bubbleOtherText = Color(0xFFF4F4F5);
+  static const Color muted = Color(0xFFB4B4BC);
+  static const Color subtle = Color(0xFFA1A1AA);
+  static const Color onGold = Color(0xFF0A0A0A);
+  static const Color errorBg = Color(0xFF2A1215);
+  static const Color errorText = Color(0xFFFCA5A5);
+}
+
 /// A floating live-chat widget (Intercom/Crisp style) that overlays a
 /// circular chat FAB in the bottom-right corner of the screen. Tapping it
 /// expands a chat panel anchored to the same corner, without navigating
@@ -266,10 +282,11 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
     return FloatingActionButton(
       onPressed: _toggle,
       backgroundColor: AppColors.gold,
+      shape: const CircleBorder(),
       elevation: 6,
       child: Icon(
         _isOpen ? Icons.close : Icons.chat_bubble_rounded,
-        color: AppColors.dark,
+        color: _ChatColors.onGold,
         size: 26,
       ),
     );
@@ -285,13 +302,13 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
       height: panelHeight,
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(22),
         clipBehavior: Clip.antiAlias,
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).dividerColor),
+            color: _ChatColors.panelBg,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: _ChatColors.panelBorder),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.35),
@@ -303,7 +320,7 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
           clipBehavior: Clip.antiAlias,
           child: !_historyLoaded
               ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.cyan),
+                  child: CircularProgressIndicator(color: AppColors.gold),
                 )
               : LayoutBuilder(
                   builder: (context, constraints) {
@@ -339,24 +356,43 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
 
   Widget _buildPanelHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.cyan.withValues(alpha: 0.1),
+      padding: const EdgeInsets.fromLTRB(20, 16, 8, 14),
+      decoration: const BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Theme.of(context).dividerColor),
+          bottom: BorderSide(color: _ChatColors.divider),
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.chat_bubble_rounded, color: AppColors.cyan, size: 18),
-          const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              'PrimeFit Assistant',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppTheme.heading(context),
-                fontSize: 14,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(
+                    const TextSpan(
+                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+                      children: [
+                        TextSpan(
+                            text: 'Prime',
+                            style: TextStyle(color: AppColors.cyan)),
+                        TextSpan(
+                            text: 'Fit',
+                            style: TextStyle(color: AppColors.gold)),
+                        TextSpan(
+                            text: ' Assistant',
+                            style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  const Text(
+                    'Ask about members, revenue and attendance.',
+                    style: TextStyle(fontSize: 12.5, color: _ChatColors.subtle),
+                  ),
+                ],
               ),
             ),
           ),
@@ -364,19 +400,19 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
             icon: const Icon(Icons.history, size: 20),
             tooltip: 'Chat history',
             onPressed: () => _openHistorySheet(context),
-            color: AppTheme.textMuted(context),
+            color: _ChatColors.muted,
           ),
           IconButton(
             icon: const Icon(Icons.add_comment_outlined, size: 20),
             tooltip: 'New chat',
             onPressed: _startNewChat,
-            color: AppColors.cyan,
+            color: _ChatColors.muted,
           ),
           IconButton(
             icon: const Icon(Icons.close, size: 20),
             tooltip: 'Close',
             onPressed: _close,
-            color: AppTheme.textMuted(context),
+            color: _ChatColors.muted,
           ),
         ],
       ),
@@ -386,9 +422,9 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
   void _openHistorySheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: _ChatColors.panelBg,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (ctx) => SizedBox(
         height: MediaQuery.of(ctx).size.height * 0.6,
@@ -410,6 +446,11 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
     );
   }
 
+  OutlineInputBorder _inputBorder(Color color) => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(999),
+        borderSide: BorderSide(color: color, width: 1.5),
+      );
+
   Widget _chatColumn(BuildContext context, double panelWidth) {
     final messages = _active?.messages ?? const <ChatMessage>[];
     return Column(
@@ -417,19 +458,19 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
       children: [
         Expanded(
           child: messages.isEmpty
-              ? Center(
+              ? const Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(24),
                     child: Text(
                       'Ask PrimeFit Assistant anything about your gym',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppTheme.textMuted(context)),
+                      style: TextStyle(color: _ChatColors.subtle),
                     ),
                   ),
                 )
               : ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
@@ -439,39 +480,41 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
                           : Alignment.centerLeft,
                       child: Container(
                         constraints: BoxConstraints(
-                          maxWidth: panelWidth * 0.7,
+                          maxWidth: panelWidth * 0.74,
                         ),
-                        margin: const EdgeInsets.only(bottom: 8),
+                        margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 9),
+                            horizontal: 14, vertical: 11),
                         decoration: BoxDecoration(
                           color: msg.isUser
-                              ? AppColors.cyan
+                              ? AppColors.gold
                               : (msg.isError
-                                  ? AppColors.dangerBg
-                                  : Theme.of(context).cardColor),
+                                  ? _ChatColors.errorBg
+                                  : _ChatColors.bubbleOther),
                           borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(12),
-                            topRight: const Radius.circular(12),
-                            bottomLeft: Radius.circular(msg.isUser ? 12 : 4),
-                            bottomRight: Radius.circular(msg.isUser ? 4 : 12),
+                            topLeft: const Radius.circular(18),
+                            topRight: const Radius.circular(18),
+                            bottomLeft: Radius.circular(msg.isUser ? 18 : 6),
+                            bottomRight: Radius.circular(msg.isUser ? 6 : 18),
                           ),
                           border: msg.isError
                               ? Border.all(color: AppColors.danger)
                               : (msg.isUser
                                   ? null
-                                  : Border.all(
-                                      color: Theme.of(context).dividerColor)),
+                                  : Border.all(color: _ChatColors.panelBorder)),
                         ),
                         child: Text(
                           msg.text,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 13.5,
+                            height: 1.45,
+                            fontWeight:
+                                msg.isUser ? FontWeight.w600 : FontWeight.normal,
                             color: msg.isUser
-                                ? Colors.white
+                                ? _ChatColors.onGold
                                 : (msg.isError
-                                    ? AppColors.danger
-                                    : AppTheme.heading(context)),
+                                    ? _ChatColors.errorText
+                                    : _ChatColors.bubbleOtherText),
                           ),
                         ),
                       ),
@@ -481,52 +524,57 @@ class _FloatingChatbotOverlayState extends State<FloatingChatbotOverlay>
         ),
         if (_isLoading)
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             child: Align(
               alignment: Alignment.centerLeft,
               child: SizedBox(
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
-                    strokeWidth: 2, color: AppColors.cyan),
+                    strokeWidth: 2, color: AppColors.gold),
               ),
             ),
           ),
         Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            border: Border(
-                top: BorderSide(color: Theme.of(context).dividerColor)),
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: _ChatColors.divider)),
           ),
           child: Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: _controller,
+                  cursorColor: AppColors.gold,
                   decoration: InputDecoration(
                     hintText: 'Ask PrimeFit Assistant...',
+                    hintStyle: const TextStyle(color: _ChatColors.subtle),
                     isDense: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(22),
-                      borderSide:
-                          BorderSide(color: Theme.of(context).dividerColor),
-                    ),
+                    filled: true,
+                    fillColor: _ChatColors.panelBg,
+                    border: _inputBorder(AppColors.gold),
+                    enabledBorder: _inputBorder(AppColors.gold),
+                    focusedBorder: _inputBorder(AppColors.gold),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                        horizontal: 18, vertical: 12),
                   ),
-                  style: const TextStyle(fontSize: 13),
+                  style: const TextStyle(fontSize: 13.5, color: Colors.white),
                   onSubmitted: (_) => _sendMessage(),
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: _isLoading ? null : _sendMessage,
-                icon: const Icon(Icons.send_rounded, color: AppColors.cyan),
-                iconSize: 22,
+                icon: const Icon(Icons.send_rounded),
+                iconSize: 21,
                 style: IconButton.styleFrom(
-                    backgroundColor: AppTheme.pageBackground(context),
-                    minimumSize: const Size(38, 38)),
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: _ChatColors.onGold,
+                  disabledBackgroundColor: AppColors.gold.withValues(alpha: 0.4),
+                  disabledForegroundColor: _ChatColors.onGold,
+                  fixedSize: const Size(44, 44),
+                  shape: const CircleBorder(),
+                ),
               ),
             ],
           ),
@@ -567,16 +615,16 @@ class _HistorySidebar extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 10),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(999)),
               textStyle: const TextStyle(fontSize: 13),
             ).merge(AppTheme.goldButtonStyle),
           ),
         ),
         Expanded(
           child: sessions.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text('No chats yet',
-                      style: TextStyle(color: AppTheme.textMuted(context))),
+                      style: TextStyle(color: _ChatColors.subtle)),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -588,19 +636,19 @@ class _HistorySidebar extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(vertical: 2),
                       decoration: BoxDecoration(
                         color: active
-                            ? AppColors.cyan.withValues(alpha: 0.12)
+                            ? AppColors.gold.withValues(alpha: 0.16)
                             : null,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: ListTile(
                         dense: true,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(12)),
                         leading: Icon(Icons.chat_bubble_outline,
                             size: 16,
                             color: active
-                                ? AppColors.cyan
-                                : AppTheme.textMuted(context)),
+                                ? AppColors.gold
+                                : _ChatColors.muted),
                         title: Text(
                           s.title,
                           maxLines: 1,
@@ -608,16 +656,15 @@ class _HistorySidebar extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight:
-                                active ? FontWeight.w600 : FontWeight.normal,
+                                active ? FontWeight.w700 : FontWeight.normal,
                             color: active
-                                ? AppColors.cyan
-                                : AppTheme.heading(context),
+                                ? AppColors.gold
+                                : _ChatColors.bubbleOtherText,
                           ),
                         ),
                         trailing: IconButton(
-                          icon: Icon(Icons.delete_outline,
-                              size: 14,
-                              color: AppTheme.textMuted(context)),
+                          icon: const Icon(Icons.delete_outline,
+                              size: 14, color: _ChatColors.muted),
                           tooltip: 'Delete chat',
                           onPressed: () => onDelete(s),
                         ),
@@ -634,9 +681,8 @@ class _HistorySidebar extends StatelessWidget {
 
     return Container(
       width: 220,
-      decoration: BoxDecoration(
-        border: Border(
-            right: BorderSide(color: Theme.of(context).dividerColor)),
+      decoration: const BoxDecoration(
+        border: Border(right: BorderSide(color: _ChatColors.divider)),
       ),
       child: content,
     );

@@ -18,7 +18,6 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
   // PrimeFit brand palette.
   static const Color gold = AppColors.gold;
   static const Color cyan = AppColors.cyan; // scanner frame
-  static const Color mutedText = AppColors.textMuted; // fallback for status pills
 
   static const Map<String, List<Color>> _subscriptionColors = {
     'active': [AppColors.successBg, AppColors.success],
@@ -76,7 +75,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
   void _showMemberScanResult(Map<String, dynamic> member) {
     final subscriptionStatus = (member['subscriptionStatus'] ?? 'expired').toString();
     final colors = _subscriptionColors[subscriptionStatus] ??
-        [const Color(0xFFF1F1F3), mutedText];
+        [const Color(0xFFF1F1F3), AppTheme.textMuted(context)];
     final isExpired = subscriptionStatus == 'expired';
     final name = member['name'] ?? '';
     final email = member['email'] ?? '';
@@ -104,7 +103,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text(email, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                  Text(email, style: TextStyle(fontSize: 12, color: AppTheme.textMuted(context))),
                 ],
               ),
             ),
@@ -184,7 +183,7 @@ class _ScanCheckInPageState extends State<ScanCheckInPage> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 100, child: Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 13))),
+          SizedBox(width: 100, child: Text(label, style: TextStyle(color: AppTheme.textMuted(context), fontSize: 13))),
           Expanded(child: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500))),
         ],
       ),

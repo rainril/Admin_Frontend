@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
@@ -15,25 +14,52 @@ class AuthFonts {
       );
 
   static TextStyle wordmark({double size = 26}) => GoogleFonts.archivoBlack(
-        fontSize: size,
-        height: 1.1,
-        letterSpacing: -0.3,
-      );
+    fontSize: size,
+    height: 1.1,
+    letterSpacing: -0.3,
+  );
 
-  static TextStyle subtitle({double size = 14, Color color = AppColors.textMuted}) =>
-      GoogleFonts.inter(fontSize: size, color: color, height: 1.4, fontWeight: FontWeight.w400);
+  static TextStyle subtitle({
+    double size = 14,
+    Color color = AppColors.textMuted,
+  }) => GoogleFonts.inter(
+    fontSize: size,
+    color: color,
+    height: 1.4,
+    fontWeight: FontWeight.w400,
+  );
 
   static TextStyle label({double size = 13, Color color = Colors.black}) =>
-      GoogleFonts.inter(fontSize: size, fontWeight: FontWeight.w600, color: color);
+      GoogleFonts.inter(
+        fontSize: size,
+        fontWeight: FontWeight.w600,
+        color: color,
+      );
 
-  static TextStyle body({double size = 13.5, Color color = Colors.black87, double height = 1.5}) =>
-      GoogleFonts.inter(fontSize: size, color: color, height: height, fontWeight: FontWeight.w400);
+  static TextStyle body({
+    double size = 13.5,
+    Color color = Colors.black87,
+    double height = 1.5,
+  }) => GoogleFonts.inter(
+    fontSize: size,
+    color: color,
+    height: height,
+    fontWeight: FontWeight.w400,
+  );
 
-  static TextStyle link({double size = 13.5, required Color color, FontWeight weight = FontWeight.w600}) =>
-      GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight);
+  static TextStyle link({
+    double size = 13.5,
+    required Color color,
+    FontWeight weight = FontWeight.w600,
+  }) => GoogleFonts.inter(fontSize: size, color: color, fontWeight: weight);
 
   static TextStyle button({double size = 15, Color color = Colors.white}) =>
-      GoogleFonts.inter(fontSize: size, fontWeight: FontWeight.w800, color: color, letterSpacing: 0.6);
+      GoogleFonts.inter(
+        fontSize: size,
+        fontWeight: FontWeight.w800,
+        color: color,
+        letterSpacing: 0.6,
+      );
 
   /// Shared text style for the auth screens' text-field input value itself
   /// (as opposed to its label/hint) — always black, since these screens
@@ -44,6 +70,14 @@ class AuthFonts {
 
 /// Panel backdrop color sampled from the login background photo's darkest corners.
 const Color authPanelBackdrop = Color(0xFF121212);
+
+/// Subtle drop-shadow for the light text sitting directly on the info
+/// panel's photo — needed now that the glass tint itself is much lighter, so
+/// text over a bright part of the photo still holds contrast without having
+/// to darken the whole panel back down.
+const List<Shadow> _authPanelTextShadow = [
+  Shadow(color: Color(0x99000000), blurRadius: 6, offset: Offset(0, 1)),
+];
 
 /// Shared amber link/accent color for the auth screens (Login, Forgot
 /// Password, Register) — used for "Forgot password?", "Sign up", "Back to
@@ -75,7 +109,10 @@ void showAuthSnack(
           Expanded(
             child: Text(
               message,
-              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500),
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -117,30 +154,26 @@ Widget buildAuthInfoPanel({bool compact = false}) {
     color: authPanelBackdrop,
     child: Stack(
       children: [
+        // Sharp, unblurred photo — no ImageFiltered/BackdropFilter here.
         Positioned.fill(
-          child: ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-            child: Image.asset(
-              'assets/images/login_bg.jpg',
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-              errorBuilder: (context, error, stackTrace) => Container(color: authPanelBackdrop),
-            ),
+          child: Image.asset(
+            'assets/images/login_bg.jpg',
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            errorBuilder: (context, error, stackTrace) =>
+                Container(color: authPanelBackdrop),
           ),
         ),
+        // The glass effect: just a semi-transparent dark tint over the full
+        // panel (edge-to-edge, no rounded corners, no inset card) -- no blur,
+        // so the photo behind it stays crisp. The vertical divider between
+        // this panel and the form panel (the "thin light-opacity border")
+        // lives in each screen's own build method, not here.
         Positioned.fill(
           child: IgnorePointer(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    authPanelBackdrop.withValues(alpha: 0.85),
-                    authPanelBackdrop.withValues(alpha: 0.35),
-                  ],
-                  stops: const [0.0, 1.0],
-                ),
+                color: authPanelBackdrop.withValues(alpha: 0.14),
               ),
             ),
           ),
@@ -156,7 +189,10 @@ Widget buildAuthInfoPanel({bool compact = false}) {
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [authPanelBackdrop, authPanelBackdrop.withValues(alpha: 0)],
+                  colors: [
+                    authPanelBackdrop,
+                    authPanelBackdrop.withValues(alpha: 0),
+                  ],
                   stops: const [0.0, 1.0],
                 ),
               ),
@@ -164,7 +200,12 @@ Widget buildAuthInfoPanel({bool compact = false}) {
           ),
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(40, compact ? 40 : 60, 40, compact ? 32 : 40),
+          padding: EdgeInsets.fromLTRB(
+            40,
+            compact ? 40 : 60,
+            40,
+            compact ? 32 : 40,
+          ),
           child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,7 +220,10 @@ Widget buildAuthInfoPanel({bool compact = false}) {
                       image: AssetImage('assets/primefit_logo.jpg'),
                       fit: BoxFit.cover,
                     ),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      width: 2,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -187,50 +231,91 @@ Widget buildAuthInfoPanel({bool compact = false}) {
                   text: TextSpan(
                     style: AuthFonts.wordmark(size: compact ? 26 : 34),
                     children: const [
-                      TextSpan(text: 'Prime', style: TextStyle(color: AppColors.cyan)),
-                      TextSpan(text: 'Fit', style: TextStyle(color: AppColors.gold)),
+                      TextSpan(
+                        text: 'Prime',
+                        style: TextStyle(
+                          color: AppColors.cyan,
+                          shadows: _authPanelTextShadow,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'Fit',
+                        style: TextStyle(
+                          color: AppColors.gold,
+                          shadows: _authPanelTextShadow,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text('Owner and Staff Portal',
-                    style: AuthFonts.body(size: 16, color: Colors.white70)),
+                Text(
+                  'Owner and Staff Portal',
+                  style: AuthFonts.body(
+                    size: 16,
+                    color: Colors.white70,
+                  ).copyWith(shadows: _authPanelTextShadow),
+                ),
                 if (!compact) ...[
                   const SizedBox(height: 16),
                   Text(
                     'Secure access for gym owners and staffs. Manage members, billing, inventory, and AI-powered analytics from one place.',
-                    style: AuthFonts.body(size: 14, color: Colors.white60, height: 1.5),
+                    style: AuthFonts.body(
+                      size: 14,
+                      color: Colors.white60,
+                      height: 1.5,
+                    ).copyWith(shadows: _authPanelTextShadow),
                   ),
                   const SizedBox(height: 28),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: Colors.white.withValues(alpha: 0.10),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.18),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.shield_outlined, color: AppColors.gold, size: 18),
+                            const Icon(
+                              Icons.shield_outlined,
+                              color: AppColors.gold,
+                              size: 18,
+                            ),
                             const SizedBox(width: 8),
-                            Text('Restricted Access',
-                                style: AuthFonts.label(size: 14, color: Colors.white)),
+                            Text(
+                              'Restricted Access',
+                              style: AuthFonts.label(
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'This portal is for authorized PrimeFit Owner and Staff only. Unauthorized access attempts are logged and monitored.',
-                          style: AuthFonts.body(size: 13, color: Colors.white54, height: 1.4),
+                          style: AuthFonts.body(
+                            size: 13,
+                            color: Colors.white54,
+                            height: 1.4,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 32),
-                  Text('© 2026 PrimeFit Fitness Gym',
-                      style: AuthFonts.body(size: 12, color: Colors.white38)),
+                  Text(
+                    '© 2026 PrimeFit Fitness Gym',
+                    style: AuthFonts.body(
+                      size: 12,
+                      color: Colors.white38,
+                    ).copyWith(shadows: _authPanelTextShadow),
+                  ),
                 ],
               ],
             ),
