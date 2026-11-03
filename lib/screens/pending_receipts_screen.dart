@@ -110,24 +110,69 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
   }
 
   Future<String?> _askReason() async {
-    return showDialog<String>(
+    final noteController = TextEditingController();
+    var selectedReason = 'Insufficient payment';
+    final result = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Reject receipt'),
-        content: const Text('Reject this payment receipt?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Reject payment request'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Choose the reason that will be emailed to the member.'),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: selectedReason,
+                decoration: const InputDecoration(labelText: 'Reason'),
+                items: const [
+                  DropdownMenuItem(value: 'Insufficient payment', child: Text('Insufficient payment')),
+                  DropdownMenuItem(value: 'Payment could not be verified', child: Text('Payment could not be verified')),
+                  DropdownMenuItem(value: 'Incorrect or incomplete information', child: Text('Incorrect or incomplete information')),
+                  DropdownMenuItem(value: 'Receipt image is unclear or missing details', child: Text('Unclear receipt image')),
+                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                ],
+                onChanged: (value) {
+                  if (value != null) setDialogState(() => selectedReason = value);
+                },
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: noteController,
+                maxLines: 3,
+                maxLength: 240,
+                decoration: const InputDecoration(
+                  labelText: 'Additional note (optional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, ''),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
-            child: const Text('Reject', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final note = noteController.text.trim();
+                final reason = selectedReason == 'Other'
+                    ? (note.isEmpty ? 'Incorrect or incomplete information' : note)
+                    : note.isEmpty
+                        ? selectedReason
+                        : '$selectedReason: $note';
+                Navigator.pop(ctx, reason);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+              child: const Text('Reject and notify', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
+    noteController.dispose();
+    return result;
   }
 
   void _toast(String msg, bool ok) {
