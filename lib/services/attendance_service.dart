@@ -65,6 +65,18 @@ class AttendanceService {
     }
   }
 
+  static Future<bool> checkOutMember(String attendanceId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/attendance/$attendanceId/check-out'),
+        headers: {'Accept': 'application/json'},
+      );
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
   // I-verify ang signed QR token (galing sa Member app), kukunin ang
   // detalye ng member mula sa memberaccount_db (via Laravel).
   static Future<Map<String, dynamic>?> verifyQrToken(String token) async {
@@ -91,6 +103,18 @@ class AttendanceService {
       return data.cast<Map<String, dynamic>>();
     }
     return [];
+  }
+
+  static Future<bool> checkOutWalkIn(String walkInId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/walk-ins/$walkInId/check-out'),
+        headers: {'Accept': 'application/json'},
+      );
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
   }
 
   static Future<Map<String, dynamic>> addWalkIn({

@@ -73,6 +73,7 @@ class _AttendancePageState extends State<AttendancePage>
   int _visibleDays = _pageSize;
   final Map<String, bool> _dayExpanded = {};
   final Set<String> _expandedRepeats = {};
+  final Set<String> _checkingOut = {};
 
   static const List<String> _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   static const List<String> _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -295,6 +296,57 @@ class _AttendancePageState extends State<AttendancePage>
   bool _hasCheckOut(Map<String, dynamic> r) {
     final v = (r['checkOut'] ?? '').toString().trim();
     return v.isNotEmpty && v != '--';
+  }
+
+  bool _isTodayRecord(Map<String, dynamic> record) {
+    final date = DateTime.tryParse((record['date'] ?? '').toString());
+    if (date == null) return false;
+    final today = DateTime.now();
+    return date.year == today.year && date.month == today.month && date.day == today.day;
+  }
+
+  bool _canCheckOut(Map<String, dynamic> record) {
+    final checkIn = (record['checkIn'] ?? '').toString().trim();
+    final status = (record['status'] ?? '').toString();
+    return _isTodayRecord(record) &&
+        !_hasCheckOut(record) &&
+        checkIn.isNotEmpty &&
+        checkIn != '--' &&
+        status != 'Absent';
+  }
+
+  Future<void> _checkOutMember(Map<String, dynamic> record) async {
+    final id = (record['id'] ?? '').toString();
+    if (id.isEmpty || !_canCheckOut(record)) return;
+    final key = 'member:$id';
+    if (!_checkingOut.add(key)) return;
+    setState(() {});
+    final success = await AttendanceService.checkOutMember(id);
+    if (!mounted) return;
+    setState(() => _checkingOut.remove(key));
+    if (success) {
+      await _loadMemberCheckIns(silent: true);
+      _showSnack('${record['name'] ?? 'Member'} checked out at ${_formatNow()}.');
+    } else {
+      _showSnack('Could not check out this member. It may already be checked out.', isError: true);
+    }
+  }
+
+  Future<void> _checkOutWalkIn(Map<String, dynamic> record) async {
+    final id = (record['id'] ?? '').toString();
+    if (id.isEmpty || !_canCheckOut(record)) return;
+    final key = 'walk-in:$id';
+    if (!_checkingOut.add(key)) return;
+    setState(() {});
+    final success = await AttendanceService.checkOutWalkIn(id);
+    if (!mounted) return;
+    setState(() => _checkingOut.remove(key));
+    if (success) {
+      await _loadWalkIns(silent: true);
+      _showSnack('${record['name'] ?? 'Walk-in'} checked out at ${_formatNow()}.');
+    } else {
+      _showSnack('Could not check out this walk-in. It may already be checked out.', isError: true);
+    }
   }
 
   String _memberKey(Map<String, dynamic> r) {
@@ -1353,7 +1405,7 @@ class _AttendancePageState extends State<AttendancePage>
           Expanded(flex: 2, child: Text('PAYMENT', style: style)),
           Expanded(flex: 2, child: Text('METHOD', style: style)),
           Expanded(flex: 2, child: Text('STATUS', style: style)),
-          SizedBox(width: 80, child: Text('ACTIONS', style: style)),
+          SizedBox(width: 178, child: Text('ACTIONS', style: style)),
         ],
       ),
     );
@@ -1409,7 +1461,7 @@ class _AttendancePageState extends State<AttendancePage>
           Expanded(flex: 2, child: Text('₱${_toDouble(r['amount']).toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.heading(context)))),
           Expanded(flex: 2, child: Text(r['method'] ?? '', style: TextStyle(fontSize: 13, color: AppTheme.heading(context)))),
           Expanded(flex: 2, child: Align(alignment: Alignment.centerLeft, child: _buildBadge(r['status'] ?? '', _statusColors))),
-          SizedBox(width: 80, child: _buildWalkInActions(r)),
+          SizedBox(width: 178, child: _buildWalkInActions(r)),
         ],
       ),
     );
@@ -1427,6 +1479,20 @@ class _AttendancePageState extends State<AttendancePage>
   Widget _buildWalkInActions(Map<String, dynamic> r) {
     return Row(
       children: [
+        if (_canCheckOut(r))
+          TextButton(
+            onPressed: _checkingOut.contains('walk-in:${r['id']}') ? null : () => _checkOutWalkIn(r),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.success,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minimumSize: const Size(0, 36),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              _checkingOut.contains('walk-in:${r['id']}') ? 'Saving…' : 'Check Out',
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+            ),
+          ),
         IconButton(
           onPressed: () => _onEditWalkIn(r),
           icon: Icon(Icons.edit_outlined, size: 18, color: AppTheme.textMuted(context)),
@@ -1460,6 +1526,7 @@ class _AttendancePageState extends State<AttendancePage>
           Expanded(flex: 2, child: Text('CHECK-IN', style: style)),
           Expanded(flex: 2, child: Text('CHECK-OUT', style: style)),
           Expanded(flex: 2, child: Text('STATUS', style: style)),
+          SizedBox(width: 115, child: Text('ACTIONS', style: style)),
         ],
       ),
     );
@@ -1591,6 +1658,26 @@ class _AttendancePageState extends State<AttendancePage>
           Expanded(flex: 2, child: Text(r['checkIn'] ?? '--', style: TextStyle(fontSize: 13, color: AppTheme.heading(context)))),
           Expanded(flex: 2, child: _checkOutCell(r)),
           Expanded(flex: 2, child: Align(alignment: Alignment.centerLeft, child: _buildBadge(_memberStatusLabel(r), _memberStatusColors))),
+          SizedBox(
+            width: 115,
+            child: _canCheckOut(r)
+                ? TextButton(
+                    onPressed: _checkingOut.contains('member:${r['id']}') ? null : () => _checkOutMember(r),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.success,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: const Size(0, 36),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      _checkingOut.contains('member:${r['id']}') ? 'Saving…' : 'Check Out',
+                      style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                    ),
+                  )
+                : _hasCheckOut(r)
+                    ? const Icon(Icons.check_circle_outline, color: AppColors.success, size: 20)
+                    : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
