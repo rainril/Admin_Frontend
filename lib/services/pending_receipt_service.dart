@@ -192,7 +192,19 @@ class PendingReceiptService {
     );
 
     if (res.statusCode != 200) {
-      throw Exception('Server returned ${res.statusCode}');
+      String? serverMessage;
+      try {
+        final body = json.decode(res.body);
+        if (body is Map) {
+          serverMessage = (body['message'] ?? body['error'])?.toString();
+        }
+      } catch (_) {
+        // Keep the HTTP status when the server returns non-JSON output.
+      }
+      final detail = serverMessage == null || serverMessage.trim().isEmpty
+          ? ''
+          : ': ${serverMessage.trim()}';
+      throw Exception('Request failed (HTTP ${res.statusCode})$detail');
     }
 
     final decoded = json.decode(res.body);

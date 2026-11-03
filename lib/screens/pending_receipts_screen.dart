@@ -63,12 +63,14 @@ class _PendingReceiptsScreenState extends State<PendingReceiptsScreen>
         _loading = false;
         _error = null;
       });
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
       setState(() {
         _loading = false;
         // A failed background poll keeps whatever list is already on screen.
-        if (!silent) _error = 'Could not load pending receipts.';
+        if (!silent) {
+          _error = error.toString().replaceFirst('Exception: ', '');
+        }
       });
     }
   }
